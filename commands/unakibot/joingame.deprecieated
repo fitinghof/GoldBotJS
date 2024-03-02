@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { saveGameData } = require('C:/Users/fitin/Documents/Javascript/GoldBotJS/funcs.js');
 
 module.exports = {
     category: 'unakibot',
@@ -6,11 +7,14 @@ module.exports = {
 		.setName('joingame')
 		.setDescription('Allows you to play in the discord game'),
 	async execute(interaction) {
+        const { gameData } = interaction.client
         if(!interaction.user.game){
             interaction.user.game = {
                 gold : 1000,
                 banks : 0,
             }
+            gameData.set(interaction.user.id, interaction.user.game);
+            saveGameData(JSON.stringify(gameData));
             await interaction.reply(`${interaction.user.username} joined the game!`);
             return
         } 

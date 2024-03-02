@@ -2,11 +2,13 @@ const { token } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-
+const { saveUser }  = require('./funcs.js');
+//const file = require('funcs.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.commands = new Collection();
 client.cooldowns = new Collection();
+client.gameData = new Collection();
 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
@@ -38,28 +40,29 @@ for (const file of eventFiles) {
 	}
 }
 
-async function saveData(users) {
-    try {
-      let content;
-      for (let index = 0; index < users.length; index++) {
-          const element = users[index].game;
-          if(game){
-              content += element;
-          }
-          
-      }
-      fs.writeFile('/Users/joe/test.txt', content);
-    } catch (err) {
-      console.log(err);
+const filePath = 'C:/Users/fitin/Documents/Javascript/GoldBotJS/persistantData/userData.json';
+
+fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+        console.error('Error reading file:', err);
+        return;
     }
-  }
-saveData(client.users);
+    try {
+		parsedData = JSON.parse(data);
+        for(const key in parsedData){
+			client.gameData.set(key, parsedData[key]);
+		}
+    } catch (error) {
+        console.error('Error parsing JSON:', error);
+    }
+});
+
+//saveData(client.users);
 // Create a new client instance
 
 // When the client is ready, run this code (only once).
 // The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
 // It makes some properties non-nullable.
-
 
 // Log in to Discord with your client's token
 client.login(token);
