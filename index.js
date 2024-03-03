@@ -1,3 +1,5 @@
+//https://discord.com/developers/applications/1205861805914857552/information
+
 const { token } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -9,6 +11,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.commands = new Collection();
 client.cooldowns = new Collection();
 client.gameData = new Collection();
+client.leaderBoards = new Collection();
 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
@@ -40,8 +43,8 @@ for (const file of eventFiles) {
 	}
 }
 
-const filePath = 'C:/Users/fitin/Documents/Javascript/GoldBotJS/persistantData/userData.json';
 
+{const filePath = 'C:/Users/fitin/Documents/Javascript/GoldBotJS/persistantData/userData.json';
 fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
         console.error('Error reading file:', err);
@@ -56,13 +59,23 @@ fs.readFile(filePath, 'utf8', (err, data) => {
         console.error('Error parsing JSON:', error);
     }
 });
+}
+{
+const filePath = 'C:/Users/fitin/Documents/Javascript/GoldBotJS/persistantData/leaderBoards.json';
+fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+        console.error('Error reading file:', err);
+        return;
+    }
+    try {
+		parsedData = JSON.parse(data);
+        for(const key in parsedData){
+			client.leaderBoards.set(key, parsedData[key]);
+		}
+    } catch (error) {
+        console.error('Error parsing JSON:', error);
+    }
+});
+}
 
-//saveData(client.users);
-// Create a new client instance
-
-// When the client is ready, run this code (only once).
-// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
-// It makes some properties non-nullable.
-
-// Log in to Discord with your client's token
 client.login(token);

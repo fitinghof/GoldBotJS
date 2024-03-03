@@ -5,13 +5,14 @@ module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
 		if (!interaction.isChatInputCommand()) return;
+
 		if(!interaction.user.game){
 			const {gameData}  = interaction.client
 			let userData = gameData.get(interaction.user.id);
 			if(!userData) 
 			{
-				gameData.set(interaction.user.id, {gold: 1000, banks: 0});
-				userData = {gold: 1000, banks: 0};
+				userData = {name: (interaction.user.nickName ?? interaction.user.globalName), gold: 1000, banks: 0};
+				gameData.set(interaction.user.id, userData);
 			} else
 			interaction.user.game = userData;
 		}
