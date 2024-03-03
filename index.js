@@ -44,7 +44,7 @@ for (const file of eventFiles) {
 }
 
 
-{const filePath = 'C:/Users/fitin/Documents/Javascript/GoldBotJS/persistantData/userData.json';
+{const filePath = './persistantData/userData.json';
 fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
         console.error('Error reading file:', err);
@@ -61,7 +61,7 @@ fs.readFile(filePath, 'utf8', (err, data) => {
 });
 }
 {
-const filePath = 'C:/Users/fitin/Documents/Javascript/GoldBotJS/persistantData/leaderBoards.json';
+const filePath = './persistantData/leaderBoards.json';
 fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
         console.error('Error reading file:', err);

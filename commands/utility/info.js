@@ -27,29 +27,25 @@ module.exports = {
             const userObj = (interaction.options.getUser("target") ?? interaction.user);
             const guildMemberObj = interaction.guild.members.cache.get(userObj.id);
             let userRoles = "";
-            interaction.guild.roles.cache.each(role => 
-                {if(role.name != "@everyone") role.members.each(user => {if(user.id === guildMemberObj.id) userRoles += role.name + "\n"})});
+            interaction.guild.roles.cache.each(role => {if(role.name != "@everyone") role.members.each(user => {if(user.id === guildMemberObj.id) userRoles += role.name + "\n"})});
             
             let audit = "";
             if(interaction.appPermissions.has(PermissionsBitField.Flags.ViewAuditLog)){
             const auditlog = await interaction.guild.fetchAuditLogs();
-            let nrOfEntries = 0;
-            auditlog.entries.each(log => 
-                {
-                    if(log.executorId == guildMemberObj.id) {
-                        if(nrOfEntries < 10) audit += log.actionType + ", " + log.targetType + ` : ${log.reason ?? 'None'}\n`;
-                        nrOfEntries++;
-                    } 
-            
-                })
-            if(nrOfEntries > 10) {
-            audit += "+ " + nrOfEntries-10 + " more";
-            } else if(nrOfEntries == 0) audit = "None";
+            auditSize = 0;
+            const userAuditLogs = auditlog.entries.filter(log => log.executorId == guildMemberObj.id) 
+            userAuditLogs.each(log => {
+                if(auditSize < 10){
+                audit += (log.actionType + ", " + log.targetType + ` ${log.reason ? `Why: ${log.reason}\n` : ""}\n`)
+                } auditSize++;
+            });            
+            audit += (auditSize >= 10) ? `+ ${auditSize - 10} more` : " ";
             } else audit = "Bot lacks sufficient permissions to view auditlog.";
+
             const embed = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle(guildMemberObj.displayName)
-            .setDescription(`Globalname: ${userObj.globalName ?? "None"}\nNickname: ${guildMemberObj.nickname ?? 'None'}\nID: ${guildMemberObj.id}${guildMemberObj.bot ? "\nBot" : ""}`)
+            .setDescription(`Globalname: ${guildMemberObj.user.globalName ?? "None"}\nNickname: ${guildMemberObj.nickname ?? 'None'}\nID: ${guildMemberObj.id}${guildMemberObj.user.bot ? "\nBot" : ""}`)
             .setThumbnail(guildMemberObj.displayAvatarURL())
             .addFields(
                 { name: 'Roles', value: userRoles, inline: true },

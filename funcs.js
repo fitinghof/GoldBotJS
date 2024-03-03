@@ -4,7 +4,7 @@ const interactionCreate = require('./events/interactionCreate');
 function saveGameData(gameData, user) {
     if(user) gameData.set(user.id, user.game)
     const data = JSON.stringify(Object.fromEntries(gameData));
-    fs.writeFile(`C:/Users/fitin/Documents/Javascript/GoldBotJS/persistantData/userData.json`,data, (err) => {console.error(err);})
+    fs.writeFile(`./persistantData/userData.json`,data, (err) => {console.error(err);})
 }
 function makeLeaderString(gameData){
     let string = "## Leaderboard:\n";
@@ -24,7 +24,7 @@ async function updateLeaderBoards(leaderBoards, gameData) {
 function saveLeaderBoards(leaderboards) {
     //Object.fromEntries(gameData)
     const data = JSON.stringify(Object.fromEntries(leaderboards));
-    fs.writeFile(`C:/Users/fitin/Documents/Javascript/GoldBotJS/persistantData/leaderBoards.json`,data, (err) => {console.error(err);})
+    fs.writeFile(`./persistantData/leaderBoards.json`,data, (err) => {console.error(err);})
 }
 module.exports = {
     saveGameData,
