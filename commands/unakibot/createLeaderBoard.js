@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
 const { saveLeaderBoards, updateLeaderBoards, makeLeaderString } = require('../../funcs');
 
 module.exports = {
@@ -7,12 +7,11 @@ module.exports = {
 		.setName('createleaderboard')
 		.setDescription(`Creates a leaderboard in the channel you sent this.`),
 	    async execute(interaction) {
-            message = await interaction.channel.send("hello");
-            interaction.client.leaderBoards.set(interaction.guild.id, message);
+            if(!interaction.appPermissions.has(PermissionsBitField.Flags.ViewChannel)) return interaction.reply({content: "Missing necessary permissions.", ephemeral: true})
+            message = await interaction.channel.send(makeLeaderString(interaction.client.gameData));
             message.pinned = true;
-            await message.edit(makeLeaderString(interaction.client.gameData));
+            interaction.client.leaderBoards.set(interaction.guild.id, {channel: interaction.channel.id, id: message.id});
             saveLeaderBoards(interaction.client.leaderBoards);
-            updateLeaderBoards(interaction.client.leaderBoards, interaction.client.gameData);
             return await interaction.reply({content: "Done!", ephemeral: true});
         },
 };

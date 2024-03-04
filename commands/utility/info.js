@@ -57,7 +57,7 @@ module.exports = {
         else if (subcommand == "game"){
             const user = interaction.user;
             if(user.game){
-                await interaction.reply(`## ${user.displayName} \n**Gold:** ${user.game.gold}🪙 \n**Banks:** ${user.game.banks}🏦`)
+                await interaction.reply(`🪙: ${user.game.gold} \n🏦: ${user.game.banks}`)
             } else await interaction.reply(`**${user.username}** \nYou need to join the game first!`)
         }
 	},

@@ -8,6 +8,7 @@ function saveGameData(gameData, user) {
 }
 function makeLeaderString(gameData){
     let string = "## Leaderboard:\n";
+    gameData.sort((user1, user2) => user2.gold - user1.gold)
     gameData.each(obj => {
         if(obj)
             string += `**${obj.name}**   -   ${obj.gold} 🪙\n`;
@@ -15,14 +16,17 @@ function makeLeaderString(gameData){
     console.log(string);
     return string;
 }
-async function updateLeaderBoards(leaderBoards, gameData) {
-    for(const key in leaderBoards){
-        await leaderBoards[key].edit(makeLeaderString(gameData));
-    }
-    console.log("updated leaderboards with:\n",makeLeaderString(gameData));
+async function updateLeaderBoards(client) {
+    console.log(client.leaderBoards);
+    const newLeaderBoard = makeLeaderString(client.gameData)
+    try {client.leaderBoards.each(async (obj, err) => {
+        const channel = await client.channels.fetch(obj.channel);
+        const message = await channel.messages.fetch(obj.id);
+        message.edit(newLeaderBoard);
+    })} catch(err) {console.error(err)}
+    console.log("updated leaderboards with:\n",newLeaderBoard);
 }
 function saveLeaderBoards(leaderboards) {
-    //Object.fromEntries(gameData)
     const data = JSON.stringify(Object.fromEntries(leaderboards));
     fs.writeFile(`./persistantData/leaderBoards.json`,data, (err) => {console.error(err);})
 }

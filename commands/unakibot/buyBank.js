@@ -19,8 +19,8 @@ module.exports = {
                 const { gameData } = interaction.client;
                 user.game.gold -= amount * 1000;
                 user.game.banks += amount;
-                saveGameData(interaction.client.gameData, targetUser);
-                updateLeaderBoards(interaction.client.leaderBoards, interaction.client.gameData);
+                saveGameData(interaction.client.gameData, user);
+                updateLeaderBoards(interaction.client);
                 return await interaction.reply(`${interaction.user.username} bought ${amount} banks`);
             }
             return await interaction.reply(`You couln't afford that many banks!`);

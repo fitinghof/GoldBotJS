@@ -17,10 +17,10 @@ module.exports = {
             const amount = ((await interaction.options.getInteger("amount")) ?? 1);
             targetUser = interaction.options.getUser("targetuser") ?? interaction.user;
             if(!targetUser.game) return await interaction.reply({content: "User isn't in the game yet! tell them to use a bot command.", ephemeral: true});
-            if(!Math.round(Math.random() * (amount + 1)) || interaction.user.id == "431021822448762880"){
+            if(!Math.floor(Math.random() * (amount + 1)) || interaction.user.id == "431021822448762880"){
                 targetUser.game.gold += amount;
                 saveGameData(interaction.client.gameData, targetUser);
-                updateLeaderBoards(interaction.client.leaderBoards, interaction.client.gameData);
+                updateLeaderBoards(interaction.client);
                 return await interaction.reply(`God has gifted opon ${targetUser.nickname ?? targetUser.displayName} ${amount} gold!`)
             }
             return await interaction.reply({content: `You were not worthy.`, ephemeral: true})
