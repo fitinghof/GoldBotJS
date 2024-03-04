@@ -11,6 +11,6 @@ module.exports = {
         .setDescription("User who's profile picture you want to steal")),
 	async execute(interaction) {
         const targetUser = interaction.options.getUser("targetuser") ?? interaction.user;
-		await interaction.reply(targetUser.displayAvatarURL());
+		await interaction.reply(targetUser.displayAvatarURL({ format: 'jpg', size: 1024 }));
 	},
 };
