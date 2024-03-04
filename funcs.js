@@ -12,9 +12,8 @@ function makeLeaderString(gameData){
     let index = 1;
     gameData.each(obj => {
         if(obj)
-            string += `**${index++}**. **${obj.name}**   -   ${obj.gold} 🪙\n`;
+            string += `**${index++}.** **${obj.name}**   -   ${obj.gold} 🪙\n`;
     });
-    console.log(string);
     return string;
 }
 async function updateLeaderBoards(client) {
