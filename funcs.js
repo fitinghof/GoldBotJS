@@ -7,11 +7,12 @@ function saveGameData(gameData, user) {
     fs.writeFile(`./persistantData/userData.json`,data, (err) => {console.error(err);})
 }
 function makeLeaderString(gameData){
-    let string = "## Leaderboard:\n";
+    let string = "### Leaderboard:\n";
     gameData.sort((user1, user2) => user2.gold - user1.gold)
+    let index = 1;
     gameData.each(obj => {
         if(obj)
-            string += `**${obj.name}**   -   ${obj.gold} 🪙\n`;
+            string += `**${index++}**. **${obj.name}**   -   ${obj.gold} 🪙\n`;
     });
     console.log(string);
     return string;
