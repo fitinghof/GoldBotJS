@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Collection} = require('discord.js');
+const { SlashCommandBuilder, Collection, ActivityType} = require('discord.js');
 const { saveGameData, updateLeaderBoards } = require('../../funcs');
 const { rouletteWaitTime } = require('../../finaFilen.json')
 module.exports = {
@@ -37,13 +37,12 @@ module.exports = {
                     return interaction.reply({content: `\`${interaction.user.displayName}\` joined \`${targetUser.displayName}\` with a bet of ${amount} on ${color}`});
                 }
                 else {
-                    spinTime = Date.now() + rouletteWaitTime;
-                    spinTime = Math.round(spinTime/1000);
+                    spinTime = Math.round((Date.now() + rouletteWaitTime)/1000);
                     interaction.client.rouletteRooms.set(roomId, new Collection().set(interaction.user.id, {color: color, bet: amount}));
                     const message = await interaction.reply(
                         {content: `\`${user.displayName}\` created a roulette room and put a bet of ${amount} on ${color}.\n` + 
                         `Join them with /roulette targetplayer: \`${user.displayName}\`!\nWheel will spin <t:${spinTime}:R>`});
-
+                    interaction.client.user.setActivity('Playing roulette', {type: ActivityType.Custom});
                     return await new Promise(() => setTimeout(() => {
                         const number = Math.floor(Math.random() * 37);
                         const color = number == 0 ? 'green' : number % 2 ? 'red' : 'black';
@@ -58,6 +57,7 @@ module.exports = {
                             message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
                         })
                         interaction.client.rouletteRooms = interaction.client.rouletteRooms.filter((obj, key) => key != roomId);
+                        if(interaction.client.rouletteRooms) {interaction.client.user.setActivity('Stealing money from children', {type: ActivityType.Custom});}
                         updateLeaderBoards(interaction.client);
                     }, rouletteWaitTime)).catch(err => console.error(err))
                 }
