@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, Collection} = require('discord.js');
 const { saveGameData, updateLeaderBoards } = require('../../funcs');
-
+const { rouletteWaitTime } = require('../../finaFilen.json')
 module.exports = {
     category: 'gambling',
 	data: new SlashCommandBuilder()
@@ -37,11 +37,13 @@ module.exports = {
                     return interaction.reply({content: `${interaction.user.displayName} joined ${targetUser.displayName} with a bet of ${amount} on ${color}`});
                 }
                 else {
-                    const waitTimeMs = 15000;
-                    spinTime = Date.now() + waitTimeMs;
+                    spinTime = Date.now() + rouletteWaitTime;
                     spinTime = Math.round(spinTime/1000);
                     interaction.client.rouletteRooms.set(roomId, new Collection().set(interaction.user.id, {color: color, bet: amount}));
-                    const message = await interaction.reply({content: `${user.displayName} created a roulette room and put a bet of ${amount} on ${color}\nWheel will spin in <t:${spinTime}:R>`});
+                    const message = await interaction.reply(
+                        {content: `${user.displayName} created a roulette room and put a bet of ${amount} on ${color}.\n
+                        Join them with /roulette targetplayer: \`${user.displayName}\`!\nWheel will spin <t:${spinTime}:R>`});
+
                     return await new Promise(() => setTimeout(() => {
                         const number = Math.floor(Math.random() * 37);
                         const color = number == 0 ? 'green' : number % 2 ? 'red' : 'black';
@@ -56,9 +58,8 @@ module.exports = {
                             message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
                         })
                         interaction.client.rouletteRooms = interaction.client.rouletteRooms.filter((obj, key) => key != roomId);
-                        console.log(interaction.client.rouletteRooms);
                         updateLeaderBoards(interaction.client);
-                    }, waitTimeMs)).catch(err => console.error(err))
+                    }, rouletteWaitTime)).catch(err => console.error(err))
                 }
             }
             else return await interaction.reply(`You're too poor!`);
