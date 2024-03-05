@@ -24,7 +24,7 @@ module.exports = {
                 targetUsergame.gold += amount;
                 saveGameData(gameData);
                 updateLeaderBoards(interaction.client);
-                return await interaction.reply(`God has gifted opon ${targetUser.displayName} ${amount} gold!`)
+                return await interaction.reply(`God has gifted opon \`${targetUser.displayName}\` ${amount} gold!`)
             }
             return await interaction.reply({content: `You were not worthy.`, ephemeral: true})
 

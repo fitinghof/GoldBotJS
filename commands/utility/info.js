@@ -59,7 +59,7 @@ module.exports = {
             const { gameData } = interaction.client;
             const userGame = gameData.get(user.id);
             if(userGame){
-                await interaction.reply(`🪙: ${userGame.gold} \n🏦: ${userGame.banks}`)
+                await interaction.reply(`🪙 : ${userGame.gold} \n🏦 : ${userGame.banks}`)
             } else await interaction.reply(`**${user.username}** \nYou need to join the game first!`)
         }
 	},

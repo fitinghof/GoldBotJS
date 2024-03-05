@@ -15,7 +15,7 @@ module.exports = {
 		const command = interaction.client.commands.get(commandName);
 
 		if(interaction.user.id != "431021822448762880") {
-			return interaction.reply({content: "Only SibbeeeGold has the power.", ephermal: true})
+			return interaction.reply({content: "Only SibbeeeGold has the power.", ephemeral: true})
 		}
 		if (!command) {
 			return interaction.reply({content: `There is no command with name \`${commandName}\`!`, ephemeral: true});
