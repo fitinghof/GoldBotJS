@@ -1,5 +1,5 @@
 const { Events, ActivityType } = require('discord.js');
-const { standardBotActivity } = require("../../finaFilen.json")
+const { standardBotActivity } = require("./../finaFilen.json")
 
 module.exports = {
 	name: Events.ClientReady,

@@ -57,7 +57,7 @@ module.exports = {
                             message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
                         })
                         interaction.client.rouletteRooms = interaction.client.rouletteRooms.filter((obj, key) => key != roomId);
-                        if(interaction.client.rouletteRooms) {interaction.client.user.setActivity(standardBotActivity, {type: ActivityType.Custom});}
+                        if(!interaction.client.rouletteRooms.first) {interaction.client.user.setActivity(standardBotActivity, {type: ActivityType.Custom});}
                         updateLeaderBoards(interaction.client);
                     }, rouletteWaitTime)).catch(err => console.error(err))
                 }
