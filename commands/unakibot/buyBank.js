@@ -1,27 +1,29 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { saveGameData, updateLeaderBoards } = require('../../funcs');
+const { bankCost, bankearnings, bankPeriodmin } = require('../../finaFilen.json');
 
 module.exports = {
     category: 'unakibot',
 	data: new SlashCommandBuilder()
 		.setName('buybank')
-		.setDescription(`Gives you ${250} gold per day, costs ${1000}`)
+		.setDescription(`Gives you ${bankearnings} gold every ${bankPeriodmin}:th minute, costs ${bankCost}`)
         .addIntegerOption(option =>
             option.setName("amount").setDescription("How many banks do you want to buy?").setMinValue(1)),
 	    async execute(interaction) {
             const amount = ((await interaction.options.getInteger("amount")) ?? 1);
+            const { gameData } = interaction.client;
             user = interaction.user;
-
-            if(!user.game) {
+            const userGame = gameData.get(user.id);
+            if(!userGame) {
                 return await interaction.reply({content: "You need to join the game first!", ephemeral: true})
             } 
-            if((amount) * 1000 <= user.game.gold) {
+            if((amount) * bankCost <= userGame.gold) {
                 const { gameData } = interaction.client;
-                user.game.gold -= amount * 1000;
-                user.game.banks += amount;
-                saveGameData(interaction.client.gameData, user);
+                userGame.gold -= amount * bankCost;
+                userGame.banks += amount;
+                saveGameData(gameData);
                 updateLeaderBoards(interaction.client);
-                return await interaction.reply(`${interaction.user.username} bought ${amount} banks`);
+                return await interaction.reply(`${user.username} bought ${amount} banks`);
             }
             return await interaction.reply(`You couln't afford that many banks!`);
         },

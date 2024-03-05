@@ -34,29 +34,33 @@ module.exports = {
                 const roomId = (targetUser ? targetUser.id : user.id);
                 if(targetUser) {
                     interaction.client.rouletteRooms.get(roomId).set(interaction.user.id, {color: color, bet: amount});
-                    interaction.reply({content: `${targetUser.displayName} joined ${targetUser.displayName} with a bet of ${amount} on ${color}`});
+                    return interaction.reply({content: `${interaction.user.displayName} joined ${targetUser.displayName} with a bet of ${amount} on ${color}`});
                 }
                 else {
-                interaction.client.rouletteRooms.set(roomId, new Collection().set(interaction.user.id, {color: color, bet: amount}));
-                interaction.reply({content: `${user.displayName} created a roulette room and put a bet of ${amount} on ${color}`});
-                const channel = interaction.channel;
+                    const waitTimeMs = 15000;
+                    spinTime = Date.now() + waitTimeMs;
+                    spinTime = Math.round(spinTime/1000);
+                    interaction.client.rouletteRooms.set(roomId, new Collection().set(interaction.user.id, {color: color, bet: amount}));
+                    const message = await interaction.reply({content: `${user.displayName} created a roulette room and put a bet of ${amount} on ${color}\nWheel will spin in <t:${spinTime}:R>`});
+                    return await new Promise(() => setTimeout(() => {
+                        const number = Math.floor(Math.random() * 37);
+                        const color = number == 0 ? 'green' : number % 2 ? 'red' : 'black';
+                        const room = rouletteRooms.get(roomId);
+                        let winners = '';
+                        room.each((user, key) => {
+                            if(user.color == color) {
+                                const winnings = ((color == "green") ? user.bet * 35 : user.bet * 2);
+                                gameData.get(key).gold += winnings;
+                                winners += `\n${gameData.get(key).name} : ${winnings} 🪙`;
+                            }
+                            message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
+                        })
+                        interaction.client.rouletteRooms = interaction.client.rouletteRooms.filter((obj, key) => key != roomId);
+                        console.log(interaction.client.rouletteRooms);
+                        updateLeaderBoards(interaction.client);
+                    }, waitTimeMs)).catch(err => console.error(err))
                 }
             }
-            return await interaction.reply(`You couln't afford that many banks!`);
+            else return await interaction.reply(`You're too poor!`);
         },
 };
-//spon roulette sorta:
-/* setTimeout(() => {
-    const number = Math.floor(Math.random() * 37);
-    const color = number == 0 ? 'green' : number % 2 ? 'red' : 'black';
-    const room = rouletteRooms.get(roomId);
-    let winners = "";
-    room.each((user, key) => {
-        if(user.color == color) {
-            gameData.get(key) += color == "green" ? user.bet * 35 : user.bet * 2;
-            winners += "\n" + gameData.get(key).name;
-        }
-        channel.send(winners ? `The winners are: ${winners}` : `No one won this time!`)
-    })
-    interaction.client.rouletteRooms.delete(roomId);
-}, 15_000) */

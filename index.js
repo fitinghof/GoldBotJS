@@ -1,10 +1,11 @@
 //https://discord.com/developers/applications/1205861805914857552/information
 
 const { token } = require('./config.json');
+const { bankCost, bankearnings, bankPeriodmin } = require('./finaFilen.json');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { saveUser }  = require('./funcs.js');
+const { saveUser, updateLeaderBoards }  = require('./funcs.js');
 //const file = require('funcs.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -78,5 +79,21 @@ fs.readFile(filePath, 'utf8', (err, data) => {
     }
 });
 }
+
+setInterval(() => {
+	const currentTime = Date.now() + (1000*60*60);
+	const minute = Math.floor((currentTime % (60 * 60 * 1000)) / (1000 * 60));
+	const hour = Math.floor((currentTime %(24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+	console.log(`h: ${hour} m: ${minute}`);
+	if(minute % bankPeriodmin == 0){
+		try {
+		client.gameData.each((obj) => {
+			obj.gold += obj.banks * bankearnings;
+			console.log(`${obj.name} got ${obj.banks * bankearnings} gold`);
+		})
+		updateLeaderBoards(client);
+		} catch(err) {console.error(err);}
+	}
+}, 60000)
 
 client.login(token);

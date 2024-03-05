@@ -49,15 +49,17 @@ module.exports = {
             .setThumbnail(guildMemberObj.displayAvatarURL())
             .addFields(
                 { name: 'Roles', value: userRoles, inline: true },
+                { name: 'Audit', value: audit, inline: true}
             )
-            .addFields({ name: 'Audit', value: audit, inline: true})
             .setTimestamp();
             await interaction.reply({embeds: [embed]});
         }
         else if (subcommand == "game"){
             const user = interaction.user;
-            if(user.game){
-                await interaction.reply(`🪙: ${user.game.gold} \n🏦: ${user.game.banks}`)
+            const { gameData } = interaction.client;
+            const userGame = gameData.get(user.id);
+            if(userGame){
+                await interaction.reply(`🪙: ${userGame.gold} \n🏦: ${userGame.banks}`)
             } else await interaction.reply(`**${user.username}** \nYou need to join the game first!`)
         }
 	},

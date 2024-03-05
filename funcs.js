@@ -2,7 +2,6 @@ const fs = require('node:fs');
 const interactionCreate = require('./events/interactionCreate');
 
 function saveGameData(gameData, user) {
-    if(user) gameData.set(user.id, user.game)
     const data = JSON.stringify(Object.fromEntries(gameData));
     fs.writeFile(`./persistantData/userData.json`,data, (err) => {console.error(err);})
 }
@@ -17,7 +16,6 @@ function makeLeaderString(gameData){
     return string;
 }
 async function updateLeaderBoards(client) {
-    console.log(client.leaderBoards);
     const newLeaderBoard = makeLeaderString(client.gameData)
     try {client.leaderBoards.each(async (obj, err) => {
         const channel = await client.channels.fetch(obj.channel);
