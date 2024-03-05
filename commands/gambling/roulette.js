@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, Collection, ActivityType} = require('discord.js');
 const { saveGameData, updateLeaderBoards } = require('../../funcs');
-const { rouletteWaitTime } = require('../../finaFilen.json')
+const { rouletteWaitTime, standardBotActivity } = require('../../finaFilen.json')
 module.exports = {
     category: 'gambling',
 	data: new SlashCommandBuilder()
@@ -57,7 +57,7 @@ module.exports = {
                             message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
                         })
                         interaction.client.rouletteRooms = interaction.client.rouletteRooms.filter((obj, key) => key != roomId);
-                        if(interaction.client.rouletteRooms) {interaction.client.user.setActivity('Stealing money from children', {type: ActivityType.Custom});}
+                        if(interaction.client.rouletteRooms) {interaction.client.user.setActivity(standardBotActivity, {type: ActivityType.Custom});}
                         updateLeaderBoards(interaction.client);
                     }, rouletteWaitTime)).catch(err => console.error(err))
                 }

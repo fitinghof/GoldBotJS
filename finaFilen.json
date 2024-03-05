@@ -2,5 +2,6 @@
     "bankCost":1000,
     "bankearnings":1,
     "bankPeriodmin":6,
-    "rouletteWaitTime":30000
+    "rouletteWaitTime":30000,
+    "standardBotActivity": "Stealing money from children"
 }
