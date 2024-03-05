@@ -28,21 +28,21 @@ module.exports = {
             if(amount <= gameData.get(user.id).gold) {
                 const { rouletteRooms } = interaction.client;
                 if(targetUser && !interaction.client.rouletteRooms.has(targetUser.id)) {
-                    return interaction.reply({content: `It doesn't seem like ${targetUser.displayName} has an active roulette room`})
+                    return interaction.reply({content: `It doesn't seem like \`${targetUser.displayName}\` has an active roulette room`})
                 }
                 gameData.get(user.id).gold -= amount;
                 const roomId = (targetUser ? targetUser.id : user.id);
                 if(targetUser) {
                     interaction.client.rouletteRooms.get(roomId).set(interaction.user.id, {color: color, bet: amount});
-                    return interaction.reply({content: `${interaction.user.displayName} joined ${targetUser.displayName} with a bet of ${amount} on ${color}`});
+                    return interaction.reply({content: `\`${interaction.user.displayName}\` joined \`${targetUser.displayName}\` with a bet of ${amount} on ${color}`});
                 }
                 else {
                     spinTime = Date.now() + rouletteWaitTime;
                     spinTime = Math.round(spinTime/1000);
                     interaction.client.rouletteRooms.set(roomId, new Collection().set(interaction.user.id, {color: color, bet: amount}));
                     const message = await interaction.reply(
-                        {content: `${user.displayName} created a roulette room and put a bet of ${amount} on ${color}.\n
-                        Join them with /roulette targetplayer: \`${user.displayName}\`!\nWheel will spin <t:${spinTime}:R>`});
+                        {content: `\`${user.displayName}\` created a roulette room and put a bet of ${amount} on ${color}.\n` + 
+                        `Join them with /roulette targetplayer: \`${user.displayName}\`!\nWheel will spin <t:${spinTime}:R>`});
 
                     return await new Promise(() => setTimeout(() => {
                         const number = Math.floor(Math.random() * 37);

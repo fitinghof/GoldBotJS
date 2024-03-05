@@ -20,7 +20,7 @@ module.exports = {
             targetUser = interaction.options.getUser("targetuser") ?? interaction.user;
             targetUsergame = gameData.get(targetUser.id);
             if(!targetUsergame) return await interaction.reply({content: "User isn't in the game yet! tell them to use a bot command.", ephemeral: true});
-            if(!Math.floor(Math.random() * (amount/50)) || interaction.user.id == "431021822448762880"){
+            if(!Math.floor(Math.random() * (amount/50)) ){
                 targetUsergame.gold += amount;
                 saveGameData(gameData);
                 updateLeaderBoards(interaction.client);

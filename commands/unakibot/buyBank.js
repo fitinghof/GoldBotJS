@@ -23,8 +23,8 @@ module.exports = {
                 userGame.banks += amount;
                 saveGameData(gameData);
                 updateLeaderBoards(interaction.client);
-                return await interaction.reply(`${user.username} bought ${amount} banks`);
+                return await interaction.reply(`${user.displayName} bought ${amount} ${(amount == 1) ? `bank` : `banks`}`);
             }
-            return await interaction.reply(`You couln't afford that many banks!`);
+            return await interaction.reply({content: `You couln't afford that many banks!`, ephemeral: true});
         },
 };
