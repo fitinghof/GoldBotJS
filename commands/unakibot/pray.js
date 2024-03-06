@@ -10,8 +10,7 @@ module.exports = {
         .addIntegerOption(option =>
             option.setName("amount")
             .setDescription("Choose how much to pray for, note, god does not look favorably opon the greedy.")
-            .setMinValue(100)
-            .setRequired(true))
+            .setMinValue(100))
         .addUserOption(option => 
             option.setName("targetuser")
             .setDescription("Who is the target of your favor")),
@@ -28,7 +27,8 @@ module.exports = {
                 saveGameData(gameData);
                 updateLeaderBoards(interaction.client);
                 return await interaction.reply(`God has gifted upon \`${targetUser.displayName}\` ${amount} gold!`)
-            } else  ((targetUsergame.failedPrayers += 1) ?? (targetUsergame.failedPrayers = 1));
+            }  
+            (targetUsergame.failedPrayers += 1) ?? (targetUsergame.failedPrayers = 1);
             return await interaction.reply({content: `You were not worthy.`, ephemeral: true})
 
         },

@@ -17,11 +17,11 @@ module.exports = {
             if((amount) * bankCost <= userGame.gold) {
                 userGame.gold -= amount * bankCost;
                 userGame.banks += amount;
-                console.log(`${userGame.name} bought ${amount} banks`)
+                console.log(`\`${userGame.name}\` bought ${amount} banks`)
                 saveGameData(gameData);
                 updateLeaderBoards(interaction.client);
                 return await interaction.reply(`${user.displayName} bought ${amount} ${(amount == 1) ? `bank` : `banks`}`);
             }
-            return await interaction.reply({content: `You couln't afford that many banks!`, ephemeral: true});
+            return await interaction.reply({content: `You couldn't afford that many banks!`, ephemeral: true});
         },
 };

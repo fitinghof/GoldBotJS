@@ -14,6 +14,7 @@ client.cooldowns = new Collection();
 client.gameData = new Collection();
 client.leaderBoards = new Collection();
 client.rouletteRooms = new Collection();
+client.rpsRooms = new Collection();
 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);

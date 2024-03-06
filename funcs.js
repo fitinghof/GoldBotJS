@@ -1,6 +1,5 @@
 const fs = require('node:fs');
 const interactionCreate = require('./events/interactionCreate');
-const { channel } = require('node:diagnostics_channel');
 
 function saveGameData(gameData, user) {
     const data = JSON.stringify(Object.fromEntries(gameData));
@@ -33,7 +32,7 @@ async function updateLeaderBoards(client) {
         console.log(`Failed to fetch message in channel ${obj.channel} with message id ${obj.id} stopped trying to update this leaderboard`)
     }
     })} catch(err) {console.error(err)}
-    console.log("updated leaderboards with:\n",newLeaderBoard);
+    console.log("updated leaderboards");
 }
 module.exports = {
     saveGameData,

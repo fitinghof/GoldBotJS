@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
 const path = require('node:path');
 
 module.exports = {
@@ -6,6 +6,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('reload')
 		.setDescription('Reloads a command.')
+		.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
 		.addStringOption(option =>
 			option.setName('command')
 				.setDescription('Only SibbeeeGold has the power')

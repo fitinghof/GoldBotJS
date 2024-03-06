@@ -47,7 +47,7 @@ module.exports = {
             const embed = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle(guildMemberObj.displayName)
-            .setDescription(`Globalname: ${guildMemberObj.user.globalName ?? "None"}\nNickname: ${guildMemberObj.nickname ?? 'None'}\nID: ${guildMemberObj.id}${guildMemberObj.user.bot ? "\nBot" : ""}`)
+            .setDescription(`Globalname: ${guildMemberObj.user.globalName ?? "None"}\nNickname: ${guildMemberObj.nickname ?? 'None'}\nID: ${guildMemberObj.id}\nJoined on: ${guildMemberObj.joinedAt}${guildMemberObj.user.bot ? "\nBot" : ""}`)
             .setThumbnail(guildMemberObj.displayAvatarURL())
             .addFields(
                 { name: 'Roles', value: userRoles, inline: true },

@@ -35,6 +35,7 @@ module.exports = {
                 }
                 gameData.get(user.id).gold -= amount;
                 const roomId = (targetUser ? targetUser.id : user.id);
+
                 if(targetUser) {
                     interaction.client.rouletteRooms.get(roomId).set(interaction.user.id, {color: color, bet: amount});
                     console.log(`\`${interaction.user.displayName}\` joined \`${targetUser.displayName}\` with a bet of ${amount} on ${color}`)
