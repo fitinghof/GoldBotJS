@@ -3,7 +3,7 @@ const { saveGameData, updateLeaderBoards } = require('../../funcs');
 const { bankCost, bankearnings, bankPeriodmin } = require('../../finaFilen.json');
 
 module.exports = {
-    category: 'unakibot',
+    category: 'gambling',
 	data: new SlashCommandBuilder()
 		.setName('rps')
 		.setDescription(`Play rock paper scissors against another player!`)
@@ -46,17 +46,17 @@ module.exports = {
                     winner = interaction.user.displayName;
                 }
                 else {
-                    userGame.gold += (maxBet + room.bet);
-                    roomGame.gold += (bet - maxBet);
+                    roomGame.gold += (room.bet + maxBet);
+                    userGame.gold += (bet - maxBet);
                     winner = targetUser.displayName;
                 }
                 weaponString = weapon == 1 ? `rock` : weapon == 2 ? `paper` : `scissors`;
                 weaponStringRoom = room.weapon == 1 ? `rock` : weapon == 2 ? `paper` : `scissors`;
                 await interaction.reply({content: `\`${interaction.user.displayName}\` used ${weaponString}, \`${targetUser.displayName}\` used ${weaponStringRoom}\n${winner ? `\`${winner}\` won ${maxBet} gold!` : "its a draw!"}`})
-                rpsRooms = rpsRooms.filter((obj, key) => key != targetUser.id);
+                interaction.client.rpsRooms.rpsRooms = rpsRooms.filter((obj, key) => key != targetUser.id);
                 return
             }
-            interaction.reply({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Date.now()+60000}:R>`})
+            interaction.reply({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Math.round((Date.now()+60000)/1000)}:R>`})
             const thisTime = Date.now();
             rpsRooms.set(interaction.user.id, {bet: bet, targetUser: targetUser.id, weapon: weapon, time: thisTime})
             return await new Promise(resolve => setTimeout( () =>{
