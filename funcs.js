@@ -18,9 +18,14 @@ function makeLeaderString(gameData){
 async function updateLeaderBoards(client) {
     const newLeaderBoard = makeLeaderString(client.gameData)
     try {client.leaderBoards.each(async (obj, err) => {
+        try {
         const channel = await client.channels.fetch(obj.channel);
         const message = await channel.messages.fetch(obj.id);
         message.edit(newLeaderBoard);
+    } catch(err) {
+        client.leaderBoards = client.leaderBoards.filter(badobj => badobj !== obj);
+        console.log(`Failed to fetch message in channel ${obj.channel} with message id ${obj.id} stopped trying to update this leaderboard`)
+    }
     })} catch(err) {console.error(err)}
     console.log("updated leaderboards with:\n",newLeaderBoard);
 }

@@ -1,10 +1,11 @@
-const { Events, Collection } = require('discord.js');
+const { Events, Collection, PermissionsBitField } = require('discord.js');
 
 
 module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
 		if (!interaction.isChatInputCommand()) return;
+		if(!interaction.appPermissions.has(PermissionsBitField.Flags.ViewChannel)) return;
 
 		if(!interaction.user.game){
 			const {gameData}  = interaction.client

@@ -31,15 +31,17 @@ module.exports = {
             
             let audit = "";
             if(interaction.appPermissions.has(PermissionsBitField.Flags.ViewAuditLog)){
-            const auditlog = await interaction.guild.fetchAuditLogs();
-            auditSize = 0;
-            const userAuditLogs = auditlog.entries.filter(log => log.executorId == guildMemberObj.id) 
-            userAuditLogs.each(log => {
-                if(auditSize < 10){
-                audit += (log.actionType + ", " + log.targetType + ` ${log.reason ? `Why: ${log.reason}\n` : ""}\n`)
-                } auditSize++;
-            });            
-            audit += (auditSize >= 10) ? `+ ${auditSize - 10} more` : " ";
+                if(guildMemberObj.permissions.has(PermissionsBitField.Flags.ViewAuditLog)){
+                    const auditlog = await interaction.guild.fetchAuditLogs();
+                    auditSize = 0;
+                    const userAuditLogs = auditlog.entries.filter(log => log.executorId == guildMemberObj.id) 
+                    userAuditLogs.each(log => {
+                        if(auditSize < 10){
+                        audit += (log.actionType + ", " + log.targetType + ` ${log.reason ? `Why: ${log.reason}\n` : ""}\n`)
+                        } auditSize++;
+                    });            
+                    audit += (auditSize >= 10) ? `+ ${auditSize - 10} more` : " ";
+                } else audit = "You lack sufficient permissions to view auditlog.";
             } else audit = "Bot lacks sufficient permissions to view auditlog.";
 
             const embed = new EmbedBuilder()

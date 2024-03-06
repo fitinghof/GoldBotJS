@@ -11,6 +11,7 @@ module.exports = {
             option.setName("amount")
             .setDescription("Choose how much to pray for, note, god does not look favorably opon the greedy.")
             .setMinValue(100))
+            .setRequired(true)
         .addUserOption(option => 
             option.setName("targetuser")
             .setDescription("Who is the target of your favor")),
