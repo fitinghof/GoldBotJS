@@ -56,7 +56,7 @@ module.exports = {
                 rpsRooms = rpsRooms.filter((obj, key) => key != targetUser.id);
                 return
             }
-            interaction.reply({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!`})
+            interaction.reply({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Date.now()+60000}:R>`})
             const thisTime = Date.now();
             rpsRooms.set(interaction.user.id, {bet: bet, targetUser: targetUser.id, weapon: weapon, time: thisTime})
             return await new Promise(resolve => setTimeout( () =>{
