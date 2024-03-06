@@ -14,13 +14,10 @@ module.exports = {
             const { gameData } = interaction.client;
             user = interaction.user;
             const userGame = gameData.get(user.id);
-            if(!userGame) {
-                return await interaction.reply({content: "You need to join the game first!", ephemeral: true})
-            } 
             if((amount) * bankCost <= userGame.gold) {
-                const { gameData } = interaction.client;
                 userGame.gold -= amount * bankCost;
                 userGame.banks += amount;
+                console.log(`${userGame.name} bought ${amount} banks`)
                 saveGameData(gameData);
                 updateLeaderBoards(interaction.client);
                 return await interaction.reply(`${user.displayName} bought ${amount} ${(amount == 1) ? `bank` : `banks`}`);

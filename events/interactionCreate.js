@@ -12,7 +12,7 @@ module.exports = {
 			let userData = gameData.get(interaction.user.id);
 			if(!userData) 
 			{
-				userData = {name: (interaction.user.displayName), gold: 1000, banks: 0};
+				userData = {name: (interaction.user.displayName), gold: 1000, banks: 0, prays:0 , totalLosses: 0, prayTotal: 0, totalWinnings: 0, failedPrayers: 0};
 				gameData.set(interaction.user.id, userData);
 			} else
 			interaction.user.game = userData;

@@ -30,10 +30,14 @@ module.exports = {
                 if(targetUser && !interaction.client.rouletteRooms.has(targetUser.id)) {
                     return interaction.reply({content: `It doesn't seem like \`${targetUser.displayName}\` has an active roulette room`})
                 }
+                if(interaction.client.rouletteRooms.has(interaction.user.id)){
+                    return interaction.reply({content: `You are already in a roulette room`, ephemeral: true})
+                }
                 gameData.get(user.id).gold -= amount;
                 const roomId = (targetUser ? targetUser.id : user.id);
                 if(targetUser) {
                     interaction.client.rouletteRooms.get(roomId).set(interaction.user.id, {color: color, bet: amount});
+                    console.log(`\`${interaction.user.displayName}\` joined \`${targetUser.displayName}\` with a bet of ${amount} on ${color}`)
                     return interaction.reply({content: `\`${interaction.user.displayName}\` joined \`${targetUser.displayName}\` with a bet of ${amount} on ${color}`});
                 }
                 else {
@@ -42,6 +46,7 @@ module.exports = {
                     const message = await interaction.reply(
                         {content: `\`${user.displayName}\` created a roulette room and put a bet of ${amount} on ${color}.\n` + 
                         `Join them with /roulette targetplayer: \`${user.displayName}\`!\nWheel will spin <t:${spinTime}:R>`});
+                    console.log(`\`${user.displayName}\` created a roulette room and put a bet of ${amount} on ${color}.`)
                     interaction.client.user.setActivity('Playing roulette', {type: ActivityType.Custom});
                     return await new Promise(() => setTimeout(() => {
                         const number = Math.floor(Math.random() * 37);
@@ -49,16 +54,21 @@ module.exports = {
                         const room = rouletteRooms.get(roomId);
                         let winners = '';
                         room.each((user, key) => {
+                            const userGame = gameData.get(key);
                             if(user.color == color) {
-                                const winnings = ((color == "green") ? user.bet * 35 : user.bet * 2);
-                                gameData.get(key).gold += winnings;
+                                const winnings = ((color == "green") ? user.bet * 36 : user.bet * 2);
+                                userGame.gold += winnings;
+                                (userGame.totalWinnings += winnings) ?? (userGame.totalWinnings = winnings);
                                 winners += `\n${gameData.get(key).name} : ${winnings} 🪙`;
                             }
-                            message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
+                            else{(userGame.totalLosses += user.bet) ?? (userGame.totalLosses = user.bet);}
                         })
+                        message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
+                        console.log(`rouletteRoom: ${user.displayName}, winning color: ${color}${winners ? ` winners: ${winners}` : `, No winners.`}` );
                         interaction.client.rouletteRooms = interaction.client.rouletteRooms.filter((obj, key) => key != roomId);
                         if(!interaction.client.rouletteRooms.first) {interaction.client.user.setActivity(standardBotActivity, {type: ActivityType.Custom});}
                         updateLeaderBoards(interaction.client);
+                        saveGameData(gameData);
                     }, rouletteWaitTime)).catch(err => console.error(err))
                 }
             }

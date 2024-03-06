@@ -1,17 +1,22 @@
 const fs = require('node:fs');
 const interactionCreate = require('./events/interactionCreate');
+const { channel } = require('node:diagnostics_channel');
 
 function saveGameData(gameData, user) {
     const data = JSON.stringify(Object.fromEntries(gameData));
     fs.writeFile(`./persistantData/userData.json`,data, (err) => {console.error(err);})
 }
+function saveLeaderBoards(leaderboards) {
+    const data = JSON.stringify(Object.fromEntries(leaderboards));
+    fs.writeFile(`./persistantData/leaderBoards.json`,data, (err) => {console.error(err);})
+}
 function makeLeaderString(gameData){
     let string = "### Leaderboard:\n";
-    gameData.sort((user1, user2) => user2.gold - user1.gold)
+    gameData.sort((user1, user2) => (user2.gold + user2.banks * 1000) - (user1.gold + user1.banks * 1000))
     let index = 1;
     gameData.each(obj => {
         if(obj)
-            string += `**${index++}.** **${obj.name}**   -   ${obj.gold} 🪙\n`;
+            string += `**${index++}.** **${obj.name}**   -   ${obj.gold} 🪙  :  ${obj.banks} 🏦\n`;
     });
     return string;
 }
@@ -24,14 +29,11 @@ async function updateLeaderBoards(client) {
         message.edit(newLeaderBoard);
     } catch(err) {
         client.leaderBoards = client.leaderBoards.filter(badobj => badobj !== obj);
+        saveLeaderBoards(client.leaderBoards)
         console.log(`Failed to fetch message in channel ${obj.channel} with message id ${obj.id} stopped trying to update this leaderboard`)
     }
     })} catch(err) {console.error(err)}
     console.log("updated leaderboards with:\n",newLeaderBoard);
-}
-function saveLeaderBoards(leaderboards) {
-    const data = JSON.stringify(Object.fromEntries(leaderboards));
-    fs.writeFile(`./persistantData/leaderBoards.json`,data, (err) => {console.error(err);})
 }
 module.exports = {
     saveGameData,
