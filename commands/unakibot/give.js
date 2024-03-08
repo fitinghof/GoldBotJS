@@ -9,11 +9,11 @@ module.exports = {
         .addIntegerOption(option =>
             option.setName("amount")
             .setDescription("Allows you to give another user gold")
+            .setMinValue(1)
             .setRequired(true))
-        .addIntegerOption(option =>
+        .addUserOption(option =>
             option.setName("target")
             .setDescription("The user that you will send gold to")
-            .setMinValue(1)
             .setRequired(true)),
 	    async execute(interaction) {
             const amount = interaction.options.getInteger("amount") ?? 100;

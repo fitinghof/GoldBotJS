@@ -46,7 +46,7 @@ module.exports = {
                     interaction.client.rouletteRooms.set(roomId, new Collection().set(interaction.user.id, {color: color, bet: amount}));
                     const message = await interaction.reply(
                         {content: `\`${user.displayName}\` created a roulette room and put a bet of ${amount} on ${color}.\n` + 
-                        `Join them with /roulette targetplayer: \`${user.displayName}\`!\nWheel will spin <t:${spinTime}:R>`});
+                        `Join them with /roulette joinplayer: \`${user.displayName}\`!\nWheel will spin <t:${spinTime}:R>`});
                     console.log(`\`${user.displayName}\` created a roulette room and put a bet of ${amount} on ${color}.`)
                     interaction.client.user.setActivity('Playing roulette', {type: ActivityType.Custom});
                     return await new Promise(() => setTimeout(() => {
