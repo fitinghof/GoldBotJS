@@ -39,7 +39,7 @@ function handValue(hand){
     return value;
 }
 
-function tableToString(dealerHand, players, showfullDealerHand = false, deck){
+function tableToString(dealerHand, players, showfullDealerHand = false, deck) {
     let tableString = "Dealer:  ";
     showfullDealerHand ? tableString += `${handToString(dealerHand)}` : tableString += `${cardsFormated[dealerHand[0]]}`;
     tableString += `  remaining cards: ${deck.length}\n`
