@@ -5,7 +5,11 @@ module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
 		if (!interaction.isChatInputCommand()) return;
-		if(!interaction.appPermissions.has(PermissionsBitField.Flags.ViewChannel)) return;
+		if(!interaction.appPermissions.has([
+			PermissionsBitField.Flags.ViewChannel,
+			PermissionsBitField.Flags.SendMessages
+		])) return;
+
 
 		if(!interaction.user.game){
 			const {gameData}  = interaction.client
