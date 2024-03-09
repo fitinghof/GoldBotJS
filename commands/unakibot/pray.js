@@ -3,7 +3,7 @@ const { saveLeaderBoards, updateLeaderBoards, makeLeaderString, saveGameData } =
 
 module.exports = {
     category: 'unakibot',
-    cooldown: 10,
+    cooldown: 5,
 	data: new SlashCommandBuilder()
 		.setName('pray')
 		.setDescription(`Allows you to pray for mor gold`)
