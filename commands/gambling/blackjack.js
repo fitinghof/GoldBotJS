@@ -96,9 +96,9 @@ module.exports = {
             .setDescription("How much to bet")
             .setMinValue(1)
             .setRequired(true))
-            .addUserOption(option => 
-                option.setName("joinplayer")
-                .setDescription("Allows you to join another players blackjack table, recommended to prevent spam.")),
+        .addUserOption(option => 
+            option.setName("joinplayer")
+            .setDescription("Allows you to join another players blackjack table, recommended to prevent spam.")),
 	    async execute(interaction) {
             const { gameData } = interaction.client;
             const { blackJackDecks } = require('../../finaFilen.json')
@@ -106,6 +106,12 @@ module.exports = {
             const bet = interaction.options.getInteger("bet");
             if(userGame.gold < bet) return await interaction.reply({content: `You can't afford that bet`, ephemeral: true})
             const targetUser = interaction.options.getUser("joinplayer");
+
+            async function closeTable(message, interaction) {
+                await message.edit({content: `Blackjack table has closed!`, components: []})
+                interaction.client.blackJackTables.sweep((table, key) => key === targetUser.id);
+            }
+            
 
             if(targetUser){
                 const table = interaction.client.blackJackTables.get(targetUser.id);
@@ -118,6 +124,7 @@ module.exports = {
                 }
                 else return await interaction.reply({content: `It doesn't seem like ${targetUser.displayName} has a table!`, ephemeral: true})
             }
+
             let deck = new Array();
             let usedCards = new Array();
             for(let i = 0; i < blackJackDecks; i++) cardFlags.each(element => deck.push(element));
@@ -127,6 +134,11 @@ module.exports = {
             players.push({name: interaction.user.displayName, id: interaction.user.id, bet: bet, hand: [], split: [], status: "", splitStatus: ""})
             const message = await interaction.reply({content: `## BlackJack\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
             const playAgain = true;
+
+            async function gameOverMessage() {
+                return {content: `${tableToString(dealerHand, players, true, deck)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]};
+            }
+
             while(playAgain){
                 usedCards = usedCards.concat(dealerHand);
                 dealerHand.splice(0, dealerHand.length);
@@ -148,7 +160,7 @@ module.exports = {
                         if(respons.customId == "start" && players.some(player => player.id === respons.user.id)) {
                             start = true;
                             table.playing = true;
-                        } else await respons.update({content: `## BlackJack\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
+                        } else await respons.update({content: message.content, components: message.components});
                         if(respons.customId == "leave") {
                             players.forEach((player, index) => {
                                 if(player.id === respons.user.id) {
@@ -158,7 +170,7 @@ module.exports = {
                                 }
                             })
                             if(players.length === 0) {
-                                await message.edit({content: `Blackjack table has closed!`, components: []})
+                                await closeTable(message, interaction);
                                 return;
                             }
                         }
@@ -169,11 +181,11 @@ module.exports = {
                         const playerGame = gameData.get(player.id);
                         playerGame.gold += player.bet;
                     })
-                    await message.edit({content: `Blackjack table has closed!`, components: []})
+                    await closeTable(message, interaction);
                     return
                 }
                 if(players.length == 0) {
-                    await message.edit({content: `Blackjack table has closed!`, components: []}) 
+                    await closeTable(message, interaction);
                     return;
                 }
                 drawCards(dealerHand, deck, 2, usedCards);
@@ -208,7 +220,7 @@ module.exports = {
                     saveGameData(gameData);
                     updateLeaderBoards(interaction.client);
                     table.playing = false;
-                    await respons.update({content: `${tableToString(dealerHand, players, true, deck)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
+                    await respons.update(gameOverMessage());
                     try {
                         while(!playAgain){
                             menuRespons = await message.awaitMessageComponent({timer: 60_000})
@@ -222,7 +234,7 @@ module.exports = {
                                     }
                                 })
                                 if(players.length === 0) {
-                                    await message.edit({content: `Blackjack table has closed!`, components: []})
+                                    await closeTable(message, interaction);
                                     return;
                                 }
                             }
@@ -372,7 +384,7 @@ module.exports = {
                 updateLeaderBoards(interaction.client);
                 saveGameData(gameData);
                 table.playing = false;
-                await interaction.editReply({content: `${tableToString(dealerHand, players, true, deck)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
+                await message.edit(gameOverMessage());
                 try {
                     while(!playAgain){
                         menuRespons = await message.awaitMessageComponent({timer: 60_000})
@@ -386,7 +398,7 @@ module.exports = {
                                 }
                             })
                             if(players.length === 0) {
-                                await message.edit({content: `Blackjack table has closed!`, components: []})
+                                await closeTable(message, interaction);
                                 return;
                             }
                         }
