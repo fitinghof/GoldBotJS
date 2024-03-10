@@ -98,4 +98,4 @@ setInterval(() => {
 	}
 }, 60000)
 
-await client.login(token);
+client.login(token);

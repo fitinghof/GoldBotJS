@@ -110,8 +110,45 @@ const cardsFormated = [
     "[King of :diamonds:]"
 ];
 
+class cardGame {
+    deck = [];
+    dealer = [];
+    players = [];
+    usedCards = [];
+    minCardsInDeck = 1;
+    constructor(nrOfDecks, minCardsInDeck){
+        for(let i = 0; i < nrOfDecks; i++) cardFlags.each(element => deck.push(element));
+        this.minCardsInDeck = minCardsInDeck;
+    }
+    drawCard(hand, nrOfCards){
+        for(let i = 0; i < nrOfCards; i++){
+            dealtCard = Math.floor(Math.random() * deck.length);
+            hand.push(deck[dealtCard]);
+            deck.splice(dealtCard, 1);
+            if(deck.length < this.minCardsInDeck ){
+                deck = deck.concat(usedCards);
+            }
+        }
+        return hand;
+    } 
+    clearAllCards(forEachPlayer = (player, index) => {}){
+        this.usedCards = this.usedCards.concat(this.dealerHand);
+        this.dealerHand.splice(0, this.dealerHand.length);
+        this.players.forEach(( player, index )=> {
+            usedCards = usedCards.concat(player.hand).concat(player.split)
+            player.hand.splice(0, player.hand.length);
+            player.split.splice(0, player.split.length);
+            forEachPlayer(player, index);
+        })
+    }
+    throwCard(hand, cardIndex){
+        this.usedCards.push(hand[cardIndex])
+        hand.splice(cardIndex, 1);
+    }
+}
 
 module.exports = {
+    cardGame,
     cardsFormated,
     cardFlags
 }

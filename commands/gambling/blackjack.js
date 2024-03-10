@@ -109,10 +109,10 @@ module.exports = {
 
             async function closeTable(message, interaction) {
                 await message.edit({content: `Blackjack table has closed!`, components: []})
-                interaction.client.blackJackTables.sweep((table, key) => key === targetUser.id);
+                interaction.client.blackJackTables.sweep((table, key) => key === interaction.user.id);
+                console.log(interaction.client.blackJackTables);
             }
             
-
             if(targetUser){
                 const table = interaction.client.blackJackTables.get(targetUser.id);
                 if(table){
@@ -135,13 +135,11 @@ module.exports = {
             const message = await interaction.reply({content: `## BlackJack\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
             const playAgain = true;
 
-            async function gameOverMessage() {
-                return {content: `${tableToString(dealerHand, players, true, deck)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]};
-            }
-
             while(playAgain){
+                //clear decks and add to used cards
                 usedCards = usedCards.concat(dealerHand);
                 dealerHand.splice(0, dealerHand.length);
+
                 players.forEach(( player, index )=> {
                     usedCards = usedCards.concat(player.hand).concat(player.split)
                     player.hand.splice(0, player.hand.length);
@@ -152,6 +150,7 @@ module.exports = {
                     if(playerGame.gold < player.bet) players.splice(index, 1)
                     else playerGame.gold -= player.bet;
                 })
+                //wait for button input
                 let respons;
                 try {
                     let start = false;
@@ -184,7 +183,7 @@ module.exports = {
                     await closeTable(message, interaction);
                     return
                 }
-                if(players.length == 0) {
+                if(players.length == 0) { // this function is probably redundant
                     await closeTable(message, interaction);
                     return;
                 }
@@ -220,7 +219,7 @@ module.exports = {
                     saveGameData(gameData);
                     updateLeaderBoards(interaction.client);
                     table.playing = false;
-                    await respons.update(gameOverMessage());
+                    await respons.update({content: `${tableToString(dealerHand, players, true, deck)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
                     try {
                         while(!playAgain){
                             menuRespons = await message.awaitMessageComponent({timer: 60_000})
@@ -384,7 +383,7 @@ module.exports = {
                 updateLeaderBoards(interaction.client);
                 saveGameData(gameData);
                 table.playing = false;
-                await message.edit(gameOverMessage());
+                await message.edit({content: `${tableToString(dealerHand, players, true, deck)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
                 try {
                     while(!playAgain){
                         menuRespons = await message.awaitMessageComponent({timer: 60_000})

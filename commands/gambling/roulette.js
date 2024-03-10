@@ -28,7 +28,7 @@ module.exports = {
             if(amount <= gameData.get(user.id).gold) {
                 const { rouletteRooms } = interaction.client;
                 if(targetUser && !interaction.client.rouletteRooms.has(targetUser.id)) {
-                    return interaction.reply({content: `It doesn't seem like \`${targetUser.displayName}\` has an active roulette room`})
+                    return interaction.reply({content: `It doesn't seem like \`${targetUser.displayName}\` has an active roulette room`, ephemeral: true})
                 }
                 if(interaction.client.rouletteRooms.has(interaction.user.id)){
                     return interaction.reply({content: `You are already in a roulette room`, ephemeral: true})
@@ -66,8 +66,8 @@ module.exports = {
                         })
                         message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
                         console.log(`rouletteRoom: ${user.displayName}, winning color: ${color}${winners ? ` winners: ${winners}` : `, No winners.`}` );
-                        interaction.client.rouletteRooms = interaction.client.rouletteRooms.filter((obj, key) => key != roomId);
-                        if(!interaction.client.rouletteRooms.first) {interaction.client.user.setActivity(standardBotActivity, {type: ActivityType.Custom});}
+                        interaction.client.rouletteRooms.sweep((obj, key) => key === roomId);
+                        if(!interaction.client.rouletteRooms.first()) {interaction.client.user.setActivity(standardBotActivity, {type: ActivityType.Custom});}
                         updateLeaderBoards(interaction.client);
                         saveGameData(gameData);
                     }, rouletteWaitTime)).catch(err => console.error(err))
