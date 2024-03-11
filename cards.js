@@ -109,24 +109,31 @@ const cardsFormated = [
     "[Queen of :diamonds:]",
     "[King of :diamonds:]"
 ];
+class hand {
+    cards = [];
+    toString() {
+        return this.cards.reduce((accumulator, currentvalue) => accumulator += (cardsFormated[currentvalue] + " "), "" )
+    }
+}
 
 class cardGame {
     deck = [];
-    dealer = [];
+    dealerHand = [];
     players = [];
     usedCards = [];
     minCardsInDeck = 1;
+
     constructor(nrOfDecks, minCardsInDeck){
-        for(let i = 0; i < nrOfDecks; i++) cardFlags.each(element => deck.push(element));
+        for(let i = 0; i < nrOfDecks; i++) cardFlags.each(element => this.deck.push(element));
         this.minCardsInDeck = minCardsInDeck;
     }
-    drawCard(hand, nrOfCards){
+    drawCards(hand, nrOfCards){
         for(let i = 0; i < nrOfCards; i++){
-            dealtCard = Math.floor(Math.random() * deck.length);
-            hand.push(deck[dealtCard]);
-            deck.splice(dealtCard, 1);
-            if(deck.length < this.minCardsInDeck ){
-                deck = deck.concat(usedCards);
+            let dealtCard = Math.floor(Math.random() * this.deck.length);
+            hand.push(this.deck[dealtCard]);
+            this.deck.splice(dealtCard, 1);
+            if(this.deck.length < this.minCardsInDeck ){
+                this.deck = this.deck.concat(usedCards);
             }
         }
         return hand;
@@ -135,7 +142,7 @@ class cardGame {
         this.usedCards = this.usedCards.concat(this.dealerHand);
         this.dealerHand.splice(0, this.dealerHand.length);
         this.players.forEach(( player, index )=> {
-            usedCards = usedCards.concat(player.hand).concat(player.split)
+            this.usedCards = this.usedCards.concat(player.hand).concat(player.split)
             player.hand.splice(0, player.hand.length);
             player.split.splice(0, player.split.length);
             forEachPlayer(player, index);
@@ -148,6 +155,7 @@ class cardGame {
 }
 
 module.exports = {
+    hand,
     cardGame,
     cardsFormated,
     cardFlags

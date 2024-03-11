@@ -5,17 +5,6 @@ const { cardsFormated, cardFlags, cardGame } = require("../../cards.js");
 const interactionCreate = require('../../events/interactionCreate.js');
 const cardValues = [11,2,3,4,5,6,7,8,9,10,10,10,10];
 
-function drawCards(hand, deck, nrOfCards = 1, usedCards){
-    for(let i = 0; i < nrOfCards; i++){
-        dealtCard = Math.floor(Math.random() * deck.length);
-        hand.push(deck[dealtCard]);
-        deck.splice(dealtCard, 1);
-        if(deck.length < 92 ){
-            deck = deck.concat(usedCards);
-        }
-    }
-    return hand;
-}
 function handToString(hand) {
     return hand.reduce((accumulator, currentvalue) => accumulator += (cardsFormated[currentvalue] + " "), "" )
 }
@@ -37,17 +26,6 @@ function handValue(hand){
     }
     value += aceValue;
     return value;
-}
-
-function tableToString(dealerHand, players, showfullDealerHand = false, deck) {
-    let tableString = "Dealer:  ";
-    showfullDealerHand ? tableString += `${handToString(dealerHand)}` : tableString += `${cardsFormated[dealerHand[0]]}`;
-    tableString += `  remaining cards: ${deck.length}\n`
-    players.forEach(player => {
-        tableString += `\n${player.name}:  ${handToString(player.hand)} ${player.status}  bet: ${player.bet} 🪙`
-        if(player.split.length) tableString += `\n${player.name} split hand:  ${handToString(player.split)} ${player.splitStatus}  bet: ${player.bet} 🪙`
-    })
-    return tableString;
 }
 
 const putButton = new ButtonBuilder()
@@ -107,12 +85,7 @@ module.exports = {
             if(userGame.gold < bet) return await interaction.reply({content: `You can't afford that bet`, ephemeral: true})
             const targetUser = interaction.options.getUser("joinplayer");
 
-            async function closeTable(message, interaction) {
-                await message.edit({content: `Blackjack table has closed!`, components: []})
-                interaction.client.blackJackTables.sweep((table, key) => key === interaction.user.id);
-                console.log(interaction.client.blackJackTables);
-            }
-            
+        
             if(targetUser){
                 const table = interaction.client.blackJackTables.get(targetUser.id);
                 if(table){
@@ -124,76 +97,74 @@ module.exports = {
                 }
                 else return await interaction.reply({content: `It doesn't seem like ${targetUser.displayName} has a table!`, ephemeral: true})
             }
-
-            let deck = new Array();
-            let usedCards = new Array();
-            for(let i = 0; i < blackJackDecks; i++) cardFlags.each(element => deck.push(element));
-            const dealerHand = new Array();
-            const players = new Array();
-            const table = interaction.client.blackJackTables.set(interaction.user.id, {playing: false, players: players})
-            players.push({name: interaction.user.displayName, id: interaction.user.id, bet: bet, hand: [], split: [], status: "", splitStatus: ""})
-            const message = await interaction.reply({content: `## BlackJack\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
-            const playAgain = true;
-
+            table = new cardGame(blackJackDecks, 92);
+            table.interaction = interaction;
+            table.message = null;
+            table.playing = false;
+            table.closeTable = async () => {
+                await table.message.edit({content: `This Blackjack table has closed!\nUse \`/blackjack\` to create a new one!`, components: []})
+                table.interaction.client.blackJackTables.sweep((room, key) => key === table.interaction.user.id);
+            }
+            table.toString = (showfullDealerHand = false) => {
+                let tableString = "Dealer:  ";
+                showfullDealerHand ? tableString += `${handToString(table.dealerHand)}` : tableString += `${cardsFormated[table.dealerHand[0]]}`;
+                tableString += `  remaining cards: ${table.deck.length}\n`
+                table.players.forEach(player => {
+                    tableString += `\n${player.name}:  ${handToString(player.hand)} ${player.status}  bet: ${player.bet} 🪙`
+                    if(player.split.length) tableString += `\n${player.name} split hand:  ${handToString(player.split)} ${player.splitStatus}  bet: ${player.bet} 🪙`
+                })
+                return tableString;
+            }
+            interaction.client.blackJackTables.set(interaction.user.id, {playing: table.playing, players: table.players})
+            table.players.push({name: interaction.user.displayName, id: interaction.user.id, bet: bet, hand: [], split: [], status: "", splitStatus: ""})
+            table.message = await interaction.reply({content: `## BlackJack\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
+            
+            let playAgain = true;
             while(playAgain){
                 //clear decks and add to used cards
-                usedCards = usedCards.concat(dealerHand);
-                dealerHand.splice(0, dealerHand.length);
-
-                players.forEach(( player, index )=> {
-                    usedCards = usedCards.concat(player.hand).concat(player.split)
-                    player.hand.splice(0, player.hand.length);
-                    player.split.splice(0, player.split.length);
-                    player.status = "";
-                    player.splitStatus = "";
-                    const playerGame = gameData.get(player.id);
-                    if(playerGame.gold < player.bet) players.splice(index, 1)
-                    else playerGame.gold -= player.bet;
-                })
+                table.clearAllCards();
                 //wait for button input
                 let respons;
                 try {
                     let start = false;
                     while(!start){
-                        respons = await message.awaitMessageComponent({time: 60_000})
-                        if(respons.customId == "start" && players.some(player => player.id === respons.user.id)) {
+                        respons = await table.message.awaitMessageComponent({time: 60_000})
+                        if(respons.customId == "start" && table.players.some(player => player.id === respons.user.id)) {
+                            table.players.forEach(( player, index )=> {
+                                player.status = "";
+                                player.splitStatus = "";
+                                const playerGame = gameData.get(player.id);
+                                if(playerGame.gold < player.bet) table.players.splice(index, 1)
+                                else playerGame.gold -= player.bet;
+                            })
                             start = true;
                             table.playing = true;
-                        } else await respons.update({content: message.content, components: message.components});
+                        } else await respons.update({content: table.message.content, components: table.message.components});
                         if(respons.customId == "leave") {
-                            players.forEach((player, index) => {
+                            table.players.forEach((player, index) => {
                                 if(player.id === respons.user.id) {
-                                    const playerGame = gameData.get(player.id);
-                                    playerGame.gold += player.bet;
-                                    players.splice(index, 1);
+                                    table.players.splice(index, 1);
                                 }
                             })
-                            if(players.length === 0) {
-                                await closeTable(message, interaction);
-                                return;
-                            }
+                        }
+                        if(table.players.length === 0) {
+                            await table.closeTable();
+                            return;
                         }
                     }
                 } catch(error) {
                     console.log("button timed out")
-                    players.forEach(player =>{
-                        const playerGame = gameData.get(player.id);
-                        playerGame.gold += player.bet;
-                    })
-                    await closeTable(message, interaction);
+                    await table.closeTable();
                     return
                 }
-                if(players.length == 0) { // this function is probably redundant
-                    await closeTable(message, interaction);
-                    return;
-                }
-                drawCards(dealerHand, deck, 2, usedCards);
-                players.forEach(player => drawCards(player.hand, deck, 2, usedCards));
 
-                let playingPlayers = players.length;
-                if(handValue(dealerHand) == 21) {
-                    blackJack = true;
-                    players.forEach(player => {
+                
+                table.drawCards(table.dealerHand, 2);
+                table.players.forEach(player => table.drawCards(player.hand, 2));
+
+                let playingPlayers = table.players.length;
+                if(handValue(table.dealerHand) == 21) {
+                    table.players.forEach(player => {
                         if(handValue(player.hand)  == 21){
                             const playerGame = gameData.get(player.id);
                             playerGame.gold += player.bet;
@@ -204,7 +175,7 @@ module.exports = {
                     })
                 }
                 else {
-                    players.forEach((player) => {
+                    table.players.forEach((player) => {
                         if(handValue(player.hand) == 21) {
                             blackJack = true;
                             const playerGame = gameData.get(player.id);
@@ -215,56 +186,34 @@ module.exports = {
                         }
                     })
                 }
-                if(!playingPlayers) {
+                if(playingPlayers == 0) {
                     saveGameData(gameData);
                     updateLeaderBoards(interaction.client);
                     table.playing = false;
-                    await respons.update({content: `${tableToString(dealerHand, players, true, deck)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
-                    try {
-                        while(!playAgain){
-                            menuRespons = await message.awaitMessageComponent({timer: 60_000})
-                            if(menuRespons.customId == "start"){
-                                playAgain = true;
-                            }
-                            if(menuRespons.customId == "leave"){
-                                players.forEach((player, index) => {
-                                    if(player.id === respons.user.id) {
-                                        players.splice(index, 1);
-                                    }
-                                })
-                                if(players.length === 0) {
-                                    await closeTable(message, interaction);
-                                    return;
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        playAgain = false;
-                    }
+                    await respons.update({content: `${table.toString(true)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
                     continue;
                 }
-                await respons.update(tableToString(dealerHand, players, false, deck));
+                await respons.update(table.toString(false));
                 //round loops
-                for(const key in players) {
-                    const player = players[key];
+                for(const index in table.players) {
+                    const player = table.players[index];
                     let status = "";
                     if(handValue(player.hand) < 21){
                         doubleButton.setDisabled(false);
                         if(cardValues[player.hand[0] % 13] == cardValues[player.hand[1] % 13]){ splitButton.setDisabled(false);}
                         let stand = false;
-                        message.edit({content: `${tableToString(dealerHand, players, false, deck)} \nPlayerTurn: ${player.name}\n${status}`, components: [buttons]})
+                        table.message.edit({content: `${table.toString(false)} \nPlayerTurn: ${player.name}\n${status}`, components: [buttons]})
                         while(!stand){
                             try {
                                 let firstCall = true;
-                                const buttonPressed = await message.awaitMessageComponent({ filter: (interaction => interaction.user.id === player.id), time: 60_000 });
+                                const buttonPressed = await table.message.awaitMessageComponent({ filter: (interaction => interaction.user.id === player.id), time: 60_000 });
 
                                 if(buttonPressed.customId == "stand") {
                                     stand = true;
                                     status = "stood";
                                 }
                                 if(buttonPressed.customId == "put") {
-                                    drawCards(player.hand, deck, 1, usedCards)
-                                    console.log(handValue(player.hand))
+                                    table.drawCards(player.hand, 1)
                                     if(handValue(player.hand) > 21) {
                                         stand = true;
                                         player.status = "went Bust!";
@@ -283,7 +232,7 @@ module.exports = {
                                     firstCall = false;
                                     player.split.push(player.hand[0]);
                                     player.hand.splice(0,1);
-                                    drawCards(player.hand, deck, 1, usedCards)
+                                    table.drawCards(player.hand, 1)
                                     drawCards(player.split, deck, 1, usedCards)
                                     status = "split";
                                     } else status = "You couldn't afford to split!"
@@ -297,7 +246,7 @@ module.exports = {
                                         const playerGame = gameData.get(player.id);
                                         playerGame.gold -= bet;
                                         player.bet *= 2;
-                                        drawCards(player.hand, deck, 1, usedCards);
+                                        table.drawCards(player.hand, 1);
                                         stand = true;
                                         if(handValue(player.hand) > 21) {
                                             player.status = "went Bust!";
@@ -309,7 +258,7 @@ module.exports = {
                                 doubleButton.setDisabled(true);
                                 splitButton.setDisabled(true);
                                 firstCall = false;
-                                await buttonPressed.update({content: `${tableToString(dealerHand, players, false, deck)} \nPlayerTurn: ${player.name}\n${status}`, components: [buttons]})
+                                await buttonPressed.update({content: `${table.toString(false)} \nPlayerTurn: ${player.name}\n${status}`, components: [buttons]})
                             } catch(error) {stand = true; console.log(`${player.name} timed out`)}
                         }
                     }
@@ -317,15 +266,16 @@ module.exports = {
                     doubleButton.setDisabled(true);
                     if(player.split.length && handValue(player.split) < 21) {
                         try {
-                            message.edit({content: `${tableToString(dealerHand, players, false, deck)} \nPlayerTurn: ${player.name} splithand\n${status}`, components: [buttons]})
+                            table.message.edit({content: `${table.toString(false)} \nPlayerTurn: ${player.name} splithand\n${status}`, components: [buttons]})
                             let stand = false;
                             while(!stand){
                                 const buttonPressed = await message.awaitMessageComponent({ filter: (interaction => interaction.user.id === player.id), time: 60_000 });
                                 if(buttonPressed.customId == "stand") {
                                     stand = true;
+                                    status = "stood";
                                 }
                                 if(buttonPressed.customId == "put") {
-                                    drawCards(player.split, deck, 1, usedCards)
+                                    table.drawCards(player.split, 1)
                                     let status = "drew a card.";
                                     if(handValue(player.split) > 21) {
                                         stand = true;
@@ -338,43 +288,43 @@ module.exports = {
                                         stand = true;
                                         status = "got 21!";
                                     } 
-                                    await buttonPressed.update({ content: `${tableToString(dealerHand, players, false, deck)}\n${player.name} ${status}`, components: [buttons] });
+                                    await buttonPressed.update({ content: `${table.toString(false)}\n${player.name} ${status}`, components: [buttons] });
                                 }
                             }
                         } catch(error){stand = true; console.log(`${player.name} timed out`);}
                     }
                 }
                 //dealer card Draw
-                while(handValue(dealerHand) < 17) drawCards(dealerHand, deck, 1, usedCards);
+                while(handValue(table.dealerHand) < 17) table.drawCards(table.dealerHand, 1);
                 
                 //cardchecking 
-                for(const index in players) {
-                    const player = players[index];
+                for(const index in table.players) {
+                    const player = table.players[index];
                     const playerGame = gameData.get(player.id);
-                    if((handValue(player.hand) > handValue(dealerHand) && !player.status) || (handValue(dealerHand) > 21 && !player.status)) {
+                    if((handValue(player.hand) > handValue(table.dealerHand) && !player.status) || (handValue(table.dealerHand) > 21 && !player.status)) {
                         playerGame.gold += (player.bet * 2);
                         playerGame.totalWinnings += (player.bet * 2);
                         player.status = `won ${player.bet * 2} 🪙`
                     }
-                    else if(handValue(player.hand) == handValue(dealerHand) && !player.status) {
+                    else if(handValue(player.hand) == handValue(table.dealerHand) && !player.status) {
                         playerGame.gold += player.bet;
                         player.status = `tied the dealer`
                     }
-                    else if(handValue(player.hand) < handValue(dealerHand) && !player.status) {
+                    else if(handValue(player.hand) < handValue(table.dealerHand) && !player.status) {
                         player.status = `lost against the dealer`
                         playerGame.totalLosses += player.bet;
                     }
                     if(player.split.length) {
-                        if((handValue(player.split) > handValue(dealerHand) && !player.splitStatus) || handValue(dealerHand) > 21) {
+                        if((handValue(player.split) > handValue(table.dealerHand) && !player.splitStatus) || handValue(table.dealerHand) > 21) {
                             playerGame.gold += (player.bet * 2);
                             playerGame.totalWinnings += (player.bet * 2);
                             player.splitStatus = `won ${player.bet * 2} 🪙`
                         }
-                        else if(handValue(player.split) == handValue(dealerHand) && !player.splitStatus) {
+                        else if(handValue(player.split) == handValue(table.dealerHand) && !player.splitStatus) {
                             playerGame.gold += player.bet;
                             player.splitStatus = `tied the dealer`
                         }
-                        else if(handValue(player.split) < handValue(dealerHand) && !player.splitStatus) {
+                        else if(handValue(player.split) < handValue(table.dealerHand) && !player.splitStatus) {
                             player.splitStatus = `lost against the dealer`
                             playerGame.totalLosses += player.bet;
                         }
@@ -383,28 +333,7 @@ module.exports = {
                 updateLeaderBoards(interaction.client);
                 saveGameData(gameData);
                 table.playing = false;
-                await message.edit({content: `${tableToString(dealerHand, players, true, deck)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
-                try {
-                    while(!playAgain){
-                        menuRespons = await message.awaitMessageComponent({timer: 60_000})
-                        if(menuRespons.customId == "start"){
-                            playAgain = true;
-                        }
-                        if(menuRespons.customId == "leave"){
-                            players.forEach((player, index) => {
-                                if(player.id === respons.user.id) {
-                                    players.splice(index, 1);
-                                }
-                            })
-                            if(players.length === 0) {
-                                await closeTable(message, interaction);
-                                return;
-                            }
-                        }
-                    }
-                } catch (error) {
-                    playAgain = false;
-                }
+                await table.message.edit({content: `${table.toString(true)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
             }
     },
 };
