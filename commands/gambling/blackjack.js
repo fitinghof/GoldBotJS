@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, Collection, ActivityType, ButtonBuilder, ButtonStyle, ActionRow, ActionRowBuilder, messageLink, Component} = require('discord.js');
 const { saveGameData, updateLeaderBoards } = require('../../funcs');
 const { rouletteWaitTime, standardBotActivity } = require('../../finaFilen.json');
-const { cardsFormated, cardFlags } = require("../../cards.js");
+const { cardsFormated, cardFlags, cardGame } = require("../../cards.js");
 const interactionCreate = require('../../events/interactionCreate.js');
 const cardValues = [11,2,3,4,5,6,7,8,9,10,10,10,10];
 
@@ -51,9 +51,9 @@ function tableToString(dealerHand, players, showfullDealerHand = false, deck) {
 }
 
 const putButton = new ButtonBuilder()
-    .setCustomId("put")
-    .setLabel("Put")
-    .setStyle(ButtonStyle.Success);
+.setCustomId("put")
+.setLabel("Put")
+.setStyle(ButtonStyle.Success);
 
 const standButton = new ButtonBuilder()
 .setCustomId("stand")
