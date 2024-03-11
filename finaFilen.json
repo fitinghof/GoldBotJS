@@ -4,5 +4,6 @@
     "bankPeriodmin":6,
     "rouletteWaitTime":30000,
     "standardBotActivity": "Stealing money from children",
-    "blackJackDecks":6
+    "blackJackDecks":6,
+    "blackjackReshuffleLimit":92
 }

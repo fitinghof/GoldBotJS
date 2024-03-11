@@ -52,7 +52,13 @@ module.exports = {
         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
 		try {
+			const startTime = Date.now()
+			const startTimeFormated = new Date(startTime).toLocaleString();
+			console.log(`[${startTimeFormated}] ${interaction.user.displayName} used "/${command.data.name}"`)
 			await command.execute(interaction);
+			const endTime = Date.now()
+			endTimeFormated = new Date(endTime).toLocaleString()
+			console.log(`[${endTimeFormated}] Command "/${command.data.name}" used by ${interaction.user.displayName} on [${startTimeFormated}] finished executing, took ${(endTime-startTime)/1000}s`)
 		} catch (error) {
 			console.error(error);
 			try {

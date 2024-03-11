@@ -79,7 +79,7 @@ module.exports = {
             .setDescription("Allows you to join another players blackjack table, recommended to prevent spam.")),
 	    async execute(interaction) {
             const { gameData } = interaction.client;
-            const { blackJackDecks } = require('../../finaFilen.json')
+            const { blackJackDecks, blackjackReshuffleLimit } = require('../../finaFilen.json')
             const userGame = gameData.get(interaction.user.id);
             const bet = interaction.options.getInteger("bet");
             if(userGame.gold < bet) return await interaction.reply({content: `You can't afford that bet`, ephemeral: true})
@@ -97,7 +97,7 @@ module.exports = {
                 }
                 else return await interaction.reply({content: `It doesn't seem like ${targetUser.displayName} has a table!`, ephemeral: true})
             }
-            table = new cardGame(blackJackDecks, 92);
+            table = new cardGame(blackJackDecks, blackjackReshuffleLimit);
             table.interaction = interaction;
             table.message = null;
             table.playing = false;

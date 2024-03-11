@@ -17,7 +17,7 @@ module.exports = {
             .setRequired(true)),
 	    async execute(interaction) {
             const amount = interaction.options.getInteger("amount") ?? 100;
-            const targetUser = interaction.option.getUser("target");
+            const targetUser = interaction.options.getUser("target");
             const targetUserGame = interaction.client.gameData.get(targetUser.id);
             const senderUserGame = interaction.client.gameData.get(interaction.user.id);
             if(senderUserGame.gold >= amount){
