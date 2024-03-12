@@ -8,7 +8,9 @@ module.exports = {
 		.setName('buybank')
 		.setDescription(`Gives you ${bankearnings} gold every ${bankPeriodmin}:th minute, costs ${bankCost}`)
         .addIntegerOption(option =>
-            option.setName("amount").setDescription("How many banks do you want to buy?").setMinValue(1)),
+            option.setName("amount")
+            .setDescription("How many banks do you want to buy?")
+            .setMinValue(1)),
 	    async execute(interaction) {
             const amount = ((await interaction.options.getInteger("amount")) ?? 1);
             const { gameData } = interaction.client;

@@ -17,12 +17,12 @@ function handValue(hand){
         else {value += cardValues[cardnum]}
     })
     let aceValue = aces * cardValues[0];
-    for(let i = 0; i <= aces; i++) {
-        aceValue -= (cardValues[0]-1)*i;
+    for(let i = 0; i < aces; i++) {
         if((aceValue + value) <= 21 ){
             value += aceValue;
             return value;
         }
+        aceValue -= (cardValues[0]-1);
     }
     value += aceValue;
     return value;
@@ -123,6 +123,10 @@ module.exports = {
             while(playAgain){
                 //clear decks and add to used cards
                 table.clearAllCards();
+                table.players.forEach(player => {
+                    table.usedCards = table.usedCards.concat(player.split);
+                    player.split.splice(0,player.split.length);
+                })
                 //wait for button input
                 let respons;
                 try {
@@ -226,14 +230,14 @@ module.exports = {
                                         status = "got 21!";
                                     } 
                                 }
-                                if(buttonPressed.customId == "split" && firstCall && player.hand[0] % 13 == player.hand[1] % 13) {
-                                    playerGame = gameData.get(player.id);
+                                if(buttonPressed.customId == "split" && firstCall && cardValues[player.hand[0] % 13] == cardValues[player.hand[1] % 13]) {
+                                    const playerGame = gameData.get(player.id);
                                     if(playerGame.gold >= player.bet) {
                                     firstCall = false;
                                     player.split.push(player.hand[0]);
                                     player.hand.splice(0,1);
                                     table.drawCards(player.hand, 1)
-                                    drawCards(player.split, deck, 1, usedCards)
+                                    table.drawCards(player.split, 1)
                                     status = "split";
                                     } else status = "You couldn't afford to split!"
 

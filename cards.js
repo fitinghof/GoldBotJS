@@ -133,7 +133,7 @@ class cardGame {
             hand.push(this.deck[dealtCard]);
             this.deck.splice(dealtCard, 1);
             if(this.deck.length < this.minCardsInDeck ){
-                this.deck = this.deck.concat(usedCards);
+                this.deck = this.deck.concat(this.usedCards);
             }
         }
         return hand;

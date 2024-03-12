@@ -9,6 +9,9 @@ const { saveUser, updateLeaderBoards }  = require('./funcs.js');
 //const file = require('funcs.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
+origlog = console.log;
+console.log = (...args) => origlog.apply(null, [`[${(new Date(Date.now()).toLocaleString())}]`].concat(args) );
+
 client.commands = new Collection();
 client.cooldowns = new Collection();
 client.gameData = new Collection();
@@ -93,6 +96,9 @@ setInterval(() => {
 			})
 			updateLeaderBoards(client);
 		} catch(err) {console.error(err);}
+	}
+	if(minute%60 === 0) {
+		console.log("--- Still living ---")
 	}
 }, 60000)
 
