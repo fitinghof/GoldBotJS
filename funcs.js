@@ -3,11 +3,15 @@ const interactionCreate = require('./events/interactionCreate');
 
 function saveGameData(gameData) {
     const data = JSON.stringify(Object.fromEntries(gameData));
-    fs.writeFile(`./persistantData/userData.json`,data, (err) => {console.error(err);})
+    fs.writeFile(`./persistantData/userData.json`,data, (err) => {
+        if(err) console.error(err);
+    })
 }
 function saveLeaderBoards(leaderboards) {
     const data = JSON.stringify(Object.fromEntries(leaderboards));
-    fs.writeFile(`./persistantData/leaderBoards.json`,data, (err) => {console.error(err);})
+    fs.writeFile(`./persistantData/leaderBoards.json`,data, (err) => {
+        if(err) console.error(err);
+    })
 }
 function makeLeaderString(gameData){
     let string = "### Leaderboard:\n";

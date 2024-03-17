@@ -142,9 +142,8 @@ class cardGame {
         this.usedCards = this.usedCards.concat(this.dealerHand);
         this.dealerHand.splice(0, this.dealerHand.length);
         this.players.forEach(( player, index )=> {
-            this.usedCards = this.usedCards.concat(player.hand).concat(player.split)
+            this.usedCards = this.usedCards.concat(player.hand)
             player.hand.splice(0, player.hand.length);
-            player.split.splice(0, player.split.length);
             forEachPlayer(player, index);
         })
     }

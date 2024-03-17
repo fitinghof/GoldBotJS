@@ -91,7 +91,7 @@ module.exports = {
                 if(table){
                     if(!table.playing){
                         interaction.client.blackJackTables.get(targetUser.id).players.push({name: interaction.user.displayName, id: interaction.user.id, bet: bet, hand: [], split: [], status: "", splitStatus: ""})
-                        return await interaction.reply({content: `You joined ${targetUser.displayName}!`, ephemeral: true})
+                        return await interaction.reply({content: `${interaction.user.displayName} joined ${targetUser.displayName}!`, ephemeral: false})
                     }
                     else return await interaction.reply({content: `${targetUser.displayName} has already started the room!`, ephemeral: true})
                 }
@@ -305,6 +305,12 @@ module.exports = {
                 for(const index in table.players) {
                     const player = table.players[index];
                     const playerGame = gameData.get(player.id);
+                    console.log(player.hand)
+                    console.log(handToString(player.hand))
+                    console.log(handValue(player.hand))
+                    console.log(table.dealerHand)
+                    console.log(handToString(table.dealerHand))
+                    console.log(handValue(table.dealerHand))
                     if((handValue(player.hand) > handValue(table.dealerHand) && !player.status) || (handValue(table.dealerHand) > 21 && !player.status)) {
                         playerGame.gold += (player.bet * 2);
                         playerGame.totalWinnings += (player.bet * 2);
