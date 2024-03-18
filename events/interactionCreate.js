@@ -1,4 +1,5 @@
 const { Events, Collection, PermissionsBitField } = require('discord.js');
+const { player } = require('../funcs.js');
 
 
 module.exports = {
@@ -10,17 +11,13 @@ module.exports = {
 			PermissionsBitField.Flags.SendMessages
 		])) return;
 
-
-		if(!interaction.user.game){
-			const {gameData}  = interaction.client
-			let userData = gameData.get(interaction.user.id);
-			if(!userData) 
-			{
-				userData = {name: (interaction.user.displayName), gold: 1000, banks: 0, prays:0 , totalLosses: 0, prayTotal: 0, totalWinnings: 0, failedPrayers: 0};
-				gameData.set(interaction.user.id, userData);
-			} else
-			interaction.user.game = userData;
-		}
+		const {gameData}  = interaction.client
+		let userData = gameData.get(interaction.user.id);
+		if(!userData) 
+		{
+			userData = new player({name: interaction.user.displayName});
+			gameData.set(interaction.user.id, userData);
+		} 
 
 		const command = interaction.client.commands.get(interaction.commandName);
 

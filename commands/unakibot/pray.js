@@ -20,15 +20,13 @@ module.exports = {
             targetUser = interaction.options.getUser("targetuser") ?? interaction.user;
             targetUsergame = gameData.get(targetUser.id);
             if(!targetUsergame) return await interaction.reply({content: "User isn't in the game yet! tell them to use a bot command.", ephemeral: true});
-            (targetUsergame.prays += 1) ?? (targetUsergame.prays = 1);
             if(!Math.floor(Math.random() * (amount/50)) ){
-                (targetUsergame.prayTotal += amount) ?? (targetUsergame.prayTotal = amount);
-                targetUsergame.gold += amount;
+                targetUsergame.addPray(amount, true);
                 saveGameData(gameData);
                 updateLeaderBoards(interaction.client);
                 return await interaction.reply(`God has gifted upon \`${targetUser.displayName}\` ${amount} gold!`)
             }  
-            (targetUsergame.failedPrayers += 1) ?? (targetUsergame.failedPrayers = 1);
+            targetUsergame.addPray(amount, false);
             return await interaction.reply({content: `You were not worthy.`, ephemeral: true})
 
         },

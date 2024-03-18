@@ -1,6 +1,4 @@
 const fs = require('node:fs');
-const interactionCreate = require('./events/interactionCreate');
-
 function saveGameData(gameData) {
     const data = JSON.stringify(Object.fromEntries(gameData));
     fs.writeFile(`./persistantData/userData.json`,data, (err) => {
@@ -39,7 +37,42 @@ async function updateLeaderBoards(client) {
     })} catch(err) {console.error(err)}
     console.log("updated leaderboards");
 }
+
+class player {
+	name;
+	gold = 1000;
+	banks = 0;
+	prays = 0;
+	totalLosses = 0;
+	prayTotal = 0;
+	totalWinnings = 0;
+	failedPrayers = 0;
+	constructor(obj){
+		this.name = obj.name;
+		this.gold = (obj.gold ?? 1000);
+		this.banks = (obj.banks ?? 0);
+		this.prays = (obj.prays ?? 0);
+		this.totalLosses = (obj.totalLosses ?? 0);
+		this.prayTotal = (obj.prayTotal ?? 0);
+		this.totalWinnings = (obj.totalWinnings ?? 0);
+		this.failedPrayers = (obj.failedPrayers ?? 0);
+	}
+    addWinnings(winnings){
+        this.gold += winnings;
+        this.winnings += winnings;
+    }
+    addPray(amount = 100, successful = true){
+        this.prays++;
+        if(!successful) this.failedPrayers++;
+        if(successful) {
+            this.prayTotal += amount;
+            this.gold += amount;
+        }
+    }
+}
+
 module.exports = {
+    player,
     saveGameData,
     saveLeaderBoards,
     makeLeaderString,

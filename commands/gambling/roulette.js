@@ -45,7 +45,7 @@ module.exports = {
                     spinTime = Math.round((Date.now() + rouletteWaitTime)/1000);
                     interaction.client.rouletteRooms.set(roomId, new Collection().set(interaction.user.id, {color: color, bet: amount}));
                     const message = await interaction.reply(
-                        {content: `\`${user.displayName}\` created a roulette room and put a bet of ${amount} on ${color}.\n` + 
+                        {content: `\`${user.displayName}\` created a roulette room and put a bet of ${amount} 🪙  on ${color}.\n` + 
                         `Join them with /roulette joinplayer: \`${user.displayName}\`!\nWheel will spin <t:${spinTime}:R>`});
                     console.log(`\`${user.displayName}\` created a roulette room and put a bet of ${amount} on ${color}.`)
                     interaction.client.user.setActivity('Playing roulette', {type: ActivityType.Custom});
@@ -53,19 +53,21 @@ module.exports = {
                         const number = Math.floor(Math.random() * 37);
                         const color = number == 0 ? 'green' : number % 2 ? 'red' : 'black';
                         const room = rouletteRooms.get(roomId);
-                        let winners = '';
+                        let playersStatus = '';
                         room.each((user, key) => {
                             const userGame = gameData.get(key);
                             if(user.color == color) {
                                 const winnings = ((color == "green") ? user.bet * 36 : user.bet * 2);
-                                userGame.gold += winnings;
-                                (userGame.totalWinnings += winnings) ?? (userGame.totalWinnings = winnings);
-                                winners += `\n${gameData.get(key).name} : ${winnings} 🪙`;
+                                userGame.addWinnings(winnings)
+                                playersStatus += `\n${gameData.get(key).name} won ${winnings} 🪙`;
                             }
-                            else{(userGame.totalLosses += user.bet) ?? (userGame.totalLosses = user.bet);}
+                            else{
+                                userGame.totalLosses += user.bet;
+                                playersStatus += `\n${gameData.get(key).name} lost ${user.bet} 🪙`
+                            }
                         })
-                        message.edit(`The winning color is... ${color}! ` + (winners ? `the winners are: ${winners}` : `No one won this time!`));
-                        console.log(`rouletteRoom: ${user.displayName}, winning color: ${color}${winners ? ` winners: ${winners}` : `, No winners.`}` );
+                        message.edit(`The winning color is... ${color}! ` + playersStatus);
+                        console.log(`rouletteRoom: ${user.displayName}, winning color: ${color}${playersStatus}` );
                         interaction.client.rouletteRooms.sweep((obj, key) => key === roomId);
                         if(!interaction.client.rouletteRooms.first()) {interaction.client.user.setActivity(standardBotActivity, {type: ActivityType.Custom});}
                         updateLeaderBoards(interaction.client);

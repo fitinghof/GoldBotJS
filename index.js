@@ -5,9 +5,13 @@ const { bankCost, bankearnings, bankPeriodmin } = require('./finaFilen.json');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { saveUser, updateLeaderBoards }  = require('./funcs.js');
-//const file = require('funcs.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const { saveUser, updateLeaderBoards, player }  = require('./funcs.js');
+
+const client = new Client({ intents: [
+	GatewayIntentBits.Guilds,
+	GatewayIntentBits.GuildMembers,
+	GatewayIntentBits.GuildPresences,
+] });
 
 origlog = console.log;
 console.log = (...args) => origlog.apply(null, [`[${(new Date(Date.now()).toLocaleString())}]`].concat(args) );
@@ -50,8 +54,8 @@ for (const file of eventFiles) {
 	}
 }
 
-
-{const filePath = './persistantData/userData.json';
+{
+const filePath = './persistantData/userData.json';
 fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
         console.error('Error reading file:', err);
@@ -60,7 +64,7 @@ fs.readFile(filePath, 'utf8', (err, data) => {
     try {
 		parsedData = JSON.parse(data);
         for(const key in parsedData){
-			client.gameData.set(key, parsedData[key]);
+			client.gameData.set(key, new player(parsedData[key]));
 		}
     } catch (error) {
         console.error('Error parsing JSON:', error);

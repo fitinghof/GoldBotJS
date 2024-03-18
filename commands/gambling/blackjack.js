@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, Collection, ActivityType, ButtonBuilder, ButtonStyle, ActionRow, ActionRowBuilder, messageLink, Component} = require('discord.js');
-const { saveGameData, updateLeaderBoards } = require('../../funcs');
+const { saveGameData, updateLeaderBoards } = require('../../funcs.js');
 const { rouletteWaitTime, standardBotActivity } = require('../../finaFilen.json');
 const { cardsFormated, cardFlags, cardGame } = require("../../cards.js");
 const interactionCreate = require('../../events/interactionCreate.js');
@@ -183,9 +183,8 @@ module.exports = {
                         if(handValue(player.hand) == 21) {
                             blackJack = true;
                             const playerGame = gameData.get(player.id);
-                            userGame.gold += Math.round(player.bet * 2.5);
+                            userGame.addWinnings(Math.round(player.bet * 2.5));
                             player.status = `Blackjack! won ${player.bet * 2.5} 🪙`
-                            playerGame.totalWinnings += (player.bet * 2.5);
                             playingPlayers--;
                         }
                     })
@@ -312,8 +311,7 @@ module.exports = {
                     console.log(handToString(table.dealerHand))
                     console.log(handValue(table.dealerHand))
                     if((handValue(player.hand) > handValue(table.dealerHand) && !player.status) || (handValue(table.dealerHand) > 21 && !player.status)) {
-                        playerGame.gold += (player.bet * 2);
-                        playerGame.totalWinnings += (player.bet * 2);
+                        playerGame.addWinnings(player.bet * 2);
                         player.status = `won ${player.bet * 2} 🪙`
                     }
                     else if(handValue(player.hand) == handValue(table.dealerHand) && !player.status) {
@@ -326,8 +324,7 @@ module.exports = {
                     }
                     if(player.split.length) {
                         if((handValue(player.split) > handValue(table.dealerHand) && !player.splitStatus) || handValue(table.dealerHand) > 21) {
-                            playerGame.gold += (player.bet * 2);
-                            playerGame.totalWinnings += (player.bet * 2);
+                            playerGame.addWinnings(player.bet * 2);
                             player.splitStatus = `won ${player.bet * 2} 🪙`
                         }
                         else if(handValue(player.split) == handValue(table.dealerHand) && !player.splitStatus) {
