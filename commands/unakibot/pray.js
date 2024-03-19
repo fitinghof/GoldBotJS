@@ -3,10 +3,10 @@ const { saveLeaderBoards, updateLeaderBoards, makeLeaderString, saveGameData } =
 
 module.exports = {
     category: 'unakibot',
-    cooldown: 5,
+    cooldown: 10,
 	data: new SlashCommandBuilder()
 		.setName('pray')
-		.setDescription(`Allows you to pray for mor gold`)
+		.setDescription(`Allows you to pray for more gold`)
         .addIntegerOption(option =>
             option.setName("amount")
             .setDescription("Choose how much to pray for, note, god does not look favorably opon the greedy.")

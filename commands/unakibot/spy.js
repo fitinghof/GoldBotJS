@@ -16,7 +16,7 @@ module.exports = {
                 const userGame = gameData.get(targetUser.id);
                 if(userGame){
                     console.log(`${interaction.user.displayName} spied on ${targetUser.displayName}`);
-                    await interaction.reply({content: `🪙 : ${userGame.gold} \n🏦 : ${userGame.banks}\n**Failed Prayers:** ${userGame.failedPrayers}\n**Successfull Prayers:** ${userGame.prays - userGame.failedPrayers}`, ephemeral: true})
+                    await interaction.reply({content: userGame.toString(), ephemeral: true})
                 } else await interaction.reply({content: `${targetUser.displayName} seems lost in a great emptiness, devoid of anything material`, ephemeral: true})
             }
         }

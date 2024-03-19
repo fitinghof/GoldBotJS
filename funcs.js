@@ -48,18 +48,19 @@ class player {
 	totalWinnings = 0;
 	failedPrayers = 0;
 	constructor(obj){
-		this.name = obj.name;
-		this.gold = (obj.gold ?? 1000);
-		this.banks = (obj.banks ?? 0);
-		this.prays = (obj.prays ?? 0);
-		this.totalLosses = (obj.totalLosses ?? 0);
-		this.prayTotal = (obj.prayTotal ?? 0);
-		this.totalWinnings = (obj.totalWinnings ?? 0);
-		this.failedPrayers = (obj.failedPrayers ?? 0);
+        for(const property in obj){
+            try {
+                this[property] = obj[property];
+            }
+            catch(error) {
+                console.error("You probably missnamed the property somewhere you dum fuck");
+                console.error(error);
+            }
+        }
 	}
     addWinnings(winnings){
-        this.gold += winnings;
-        this.winnings += winnings;
+        this.gold += Math.round(winnings);
+        this.winnings += Math.round(winnings);
     }
     addPray(amount = 100, successful = true){
         this.prays++;
@@ -68,6 +69,16 @@ class player {
             this.prayTotal += amount;
             this.gold += amount;
         }
+    }
+    toString(){
+        return (
+        `🪙 : ${this.gold} \n` +
+        `🏦 : ${this.banks}\n` +
+        `**Failed Prayers:** ${this.failedPrayers}\n` +
+        `**Successfull Prayers:** ${this.prays - this.failedPrayers}\n` +
+        `**Total Winnings:** ${this.totalWinnings}\n` +
+        `**Total Losses:** ${this.totalLosses}`
+        )
     }
 }
 
