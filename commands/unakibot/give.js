@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
-const { saveLeaderBoards, updateLeaderBoards, makeLeaderString } = require('../../funcs');
+const { saveLeaderBoards, updateLeaderBoards, saveGameData, makeLeaderString } = require('../../funcs');
 
 module.exports = {
     category: 'unakibot',
@@ -24,6 +24,8 @@ module.exports = {
                 if(targetUserGame){
                     senderUserGame.gold -= amount;
                     targetUserGame.gold += amount;
+                    saveGameData(interaction.client.gameData);
+                    updateLeaderBoards(interaction.client);
                     return await interaction.reply({content: `${interaction.user.displayName} sent ${targetUser.displayName} ${amount} gold!`, ephemeral: false})
                 }
                 return await interaction.reply({content: `${targetUser.displayName} isn't in the game yet!`, ephemeral: true})

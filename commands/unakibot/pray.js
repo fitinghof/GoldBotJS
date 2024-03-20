@@ -24,8 +24,10 @@ module.exports = {
                 targetUsergame.addPray(amount, true);
                 saveGameData(gameData);
                 updateLeaderBoards(interaction.client);
-                return await interaction.reply(`God has gifted upon \`${targetUser.displayName}\` ${amount} gold!`)
+                console.log(`"${interaction.user.displayName}" prayed for ${amount} to "${targetUser.displayName}" success`)
+                return await interaction.reply(`God has gifted upon \`${targetUser.displayName}\` ${amount} 🪙 !`)
             }  
+            console.log(`"${interaction.user.displayName}" prayed for ${amount} to "${targetUser.displayName}" failed`)
             targetUsergame.addPray(amount, false);
             return await interaction.reply({content: `You were not worthy.`, ephemeral: true})
 

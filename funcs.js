@@ -1,3 +1,4 @@
+const { jackPot } = require("/persistantData/otherData.json")
 const fs = require('node:fs');
 function saveGameData(gameData) {
     const data = JSON.stringify(Object.fromEntries(gameData));
@@ -47,6 +48,8 @@ class player {
 	prayTotal = 0;
 	totalWinnings = 0;
 	failedPrayers = 0;
+    highestBlackjackWin = 0;
+    highestRouletteWin = 0;
 	constructor(obj){
         for(const property in obj){
             try {
@@ -76,6 +79,7 @@ class player {
         `🏦 : ${this.banks}\n` +
         `**Failed Prayers:** ${this.failedPrayers}\n` +
         `**Successfull Prayers:** ${this.prays - this.failedPrayers}\n` +
+        `**Blessings from god:** ${this.prayTotal}\n` +
         `**Total Winnings:** ${this.totalWinnings}\n` +
         `**Total Losses:** ${this.totalLosses}`
         )

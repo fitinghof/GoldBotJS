@@ -183,8 +183,9 @@ module.exports = {
                         if(handValue(player.hand) == 21) {
                             blackJack = true;
                             const playerGame = gameData.get(player.id);
-                            userGame.addWinnings(Math.round(player.bet * 2.5));
-                            player.status = `Blackjack! won ${player.bet * 2.5} 🪙`
+                            playerGame.addWinnings(Math.round(player.bet * 3));
+                            if(playerGame.highestBlackjackWin < (player.bet * 3)) playerGame.highestBlackjackWin = (player.bet * 3);
+                            player.status = `Blackjack! won ${player.bet * 3} 🪙`
                             playingPlayers--;
                         }
                     })
@@ -312,6 +313,7 @@ module.exports = {
                     console.log(handValue(table.dealerHand))
                     if((handValue(player.hand) > handValue(table.dealerHand) && !player.status) || (handValue(table.dealerHand) > 21 && !player.status)) {
                         playerGame.addWinnings(player.bet * 2);
+                        if(playerGame.highestBlackjackWin < (player.bet * 2)) playerGame.highestBlackjackWin = (player.bet * 2);
                         player.status = `won ${player.bet * 2} 🪙`
                     }
                     else if(handValue(player.hand) == handValue(table.dealerHand) && !player.status) {
@@ -325,6 +327,7 @@ module.exports = {
                     if(player.split.length) {
                         if((handValue(player.split) > handValue(table.dealerHand) && !player.splitStatus) || handValue(table.dealerHand) > 21) {
                             playerGame.addWinnings(player.bet * 2);
+                            if(playerGame.highestBlackjackWin < (player.bet * 2)) playerGame.highestBlackjackWin = (player.bet * 2);
                             player.splitStatus = `won ${player.bet * 2} 🪙`
                         }
                         else if(handValue(player.split) == handValue(table.dealerHand) && !player.splitStatus) {

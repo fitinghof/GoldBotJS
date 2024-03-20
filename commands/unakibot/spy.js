@@ -7,7 +7,8 @@ module.exports = {
 		.setName('spy')
 		.setDescription(`Allows you to peer into the pockets of strangers`)
         .addUserOption(option =>
-            option.setName("target").setDescription("Who is the target of your perversion?")
+            option.setName("target")
+            .setDescription("Who is the target of your perversion?")
             .setRequired(true)),
 	    async execute(interaction) {
             const targetUser = interaction.options.getUser("target");

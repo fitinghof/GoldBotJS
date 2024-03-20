@@ -3,7 +3,7 @@ const { saveGameData, updateLeaderBoards } = require('../../funcs');
 const { rouletteWaitTime, standardBotActivity } = require('../../finaFilen.json')
 module.exports = {
     category: 'gambling',
-    cooldown: 36000,
+    cooldown: 7200,
 	data: new SlashCommandBuilder()
 		.setName('rob')
 		.setDescription(`Allows you to rob another player but make sure they're not home!`)
@@ -19,13 +19,20 @@ module.exports = {
             const robAmount = interaction.options.getInteger("amount") ?? 100;
             const playerGame = interaction.client.gameData.get(interaction.user.id);
             if(playerGame.gold < (robAmount / 5)) {
+                interaction.client.cooldowns.get(interaction.commandName).delete(interaction.user.id);
                 return await interaction.reply({content: `You couldn't afford the equipment neccessary for a heist of this scale and promptly gave up.`, ephemeral: true})
             }
             const { gameData } = interaction.client;
             const targetUser = await interaction.guild.members.fetch(await interaction.options.getUser("target").id);
             const targetUserGame = gameData.get(targetUser.id);
-            if (!targetUserGame) return await interaction.reply({content: `You find ${targetUser.displayName} begging for cash outside of ICA. You kick him and leave. He should have bought some banks!`, ephemeral: true}) 
-            if (targetUserGame.gold < robAmount) return await interaction.reply({content: `After scouting the propery you realise this guy wasn't worth as much as you thought and leave in dissapointment.`, ephemeral: true})
+            if (!targetUserGame) {
+                interaction.client.cooldowns.get(interaction.commandName).delete(interaction.user.id);
+                return await interaction.reply({content: `You find ${targetUser.displayName} begging for cash outside of ICA. You kick him and leave. He should have bought some banks!`, ephemeral: true})
+            } 
+            if (targetUserGame.gold < robAmount) {
+                interaction.client.cooldowns.get(interaction.commandName).delete(interaction.user.id);
+                return await interaction.reply({content: `After scouting the propery you realise this guy wasn't worth as much as you thought and leave in dissapointment.`, ephemeral: true})
+            }
             const activity = (targetUser.presence) ? targetUser.presence.status : "idle";
             const activityChanceModifier = (activity === "online") ? 100 : (activity === "idle" || activity === "dnd") ? 1 : 0.5;
             //const chance = 0.8 / (1 + (40/Math.pow(targetUserGame.gold / robAmount, 3)) * activityChanceModifier);
@@ -35,6 +42,8 @@ module.exports = {
             if(!Math.floor(Math.random() * 1/chance)){
                 targetUserGame.gold -= robAmount;
                 playerGame.gold += Math.round(robAmount*6/5);
+                saveGameData(interaction.client.gameData);
+                updateLeaderBoards(interaction.client);
                 return await interaction.reply({content: `${interaction.user.displayName} robbed ${targetUser.displayName} for ${robAmount} 🪙!`, ephemeral: false})
             }
             return await interaction.reply({content: `After tripping on a sausage and slapping the dog with a lamp you get caught by the police and lose your pricey equipment!`, ephemeral: true})

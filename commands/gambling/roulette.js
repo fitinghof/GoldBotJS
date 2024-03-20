@@ -59,11 +59,12 @@ module.exports = {
                             if(user.color == color) {
                                 const winnings = ((color == "green") ? user.bet * 36 : user.bet * 2);
                                 userGame.addWinnings(winnings)
+                                if(userGame.highestRouletteWin < winnings) userGame.highestRouletteWin = winnings;
                                 playersStatus += `\n${gameData.get(key).name} won ${winnings} 🪙`;
                             }
                             else{
                                 userGame.totalLosses += user.bet;
-                                playersStatus += `\n${gameData.get(key).name} lost ${user.bet} 🪙`
+                                playersStatus += `\n${gameData.get(key).name} lost ${user.bet} 🪙`;
                             }
                         })
                         message.edit(`The winning color is... ${color}! ` + playersStatus);
