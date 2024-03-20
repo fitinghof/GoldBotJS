@@ -1,13 +1,12 @@
-const { jackPot } = require("/persistantData/otherData.json")
 const fs = require('node:fs');
 function saveGameData(gameData) {
-    const data = JSON.stringify(Object.fromEntries(gameData));
+    const data = JSON.stringify(Object.fromEntries(gameData), null, 2);
     fs.writeFile(`./persistantData/userData.json`,data, (err) => {
         if(err) console.error(err);
     })
 }
 function saveLeaderBoards(leaderboards) {
-    const data = JSON.stringify(Object.fromEntries(leaderboards));
+    const data = JSON.stringify(Object.fromEntries(leaderboards), null, 2);
     fs.writeFile(`./persistantData/leaderBoards.json`,data, (err) => {
         if(err) console.error(err);
     })
@@ -50,6 +49,7 @@ class player {
 	failedPrayers = 0;
     highestBlackjackWin = 0;
     highestRouletteWin = 0;
+    log = "\n**Log:**";
 	constructor(obj){
         for(const property in obj){
             try {
@@ -83,6 +83,12 @@ class player {
         `**Total Winnings:** ${this.totalWinnings}\n` +
         `**Total Losses:** ${this.totalLosses}`
         )
+    }
+    addLog(loggedData) {
+        this.log += `\n[${(new Date(Date.now()).toLocaleString())}] ${loggedData}`
+    }
+    clearLog(){
+        this.log = "\n**Log:**";
     }
 }
 

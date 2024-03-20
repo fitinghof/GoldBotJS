@@ -4,7 +4,7 @@ const { token } = require('./config.json');
 const { bankCost, bankearnings, bankPeriodmin } = require('./finaFilen.json');
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, InteractionCollector } = require('discord.js');
 const { saveUser, updateLeaderBoards, player }  = require('./funcs.js');
 
 const client = new Client({ intents: [
@@ -23,6 +23,7 @@ client.leaderBoards = new Collection();
 client.rouletteRooms = new Collection();
 client.rpsRooms = new Collection();
 client.blackJackTables = new Collection();
+client.data = new Map();
 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
@@ -41,6 +42,7 @@ for (const folder of commandFolders) {
 		}
 	}
 }
+
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -88,6 +90,7 @@ fs.readFile(filePath, 'utf8', (err, data) => {
     }
 });
 }
+updateLeaderBoards(client);
 
 setInterval(() => {
 	const currentTime = Date.now() + (1000*60*60);

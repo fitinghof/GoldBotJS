@@ -41,6 +41,7 @@ module.exports = {
             playerGame.gold -= Math.round(robAmount/5);
             if(!Math.floor(Math.random() * 1/chance)){
                 targetUserGame.gold -= robAmount;
+                targetUserGame.addLog(`${interaction.user.displayName} robbed you for ${robAmount} 🪙!`)
                 playerGame.gold += Math.round(robAmount*6/5);
                 saveGameData(interaction.client.gameData);
                 updateLeaderBoards(interaction.client);

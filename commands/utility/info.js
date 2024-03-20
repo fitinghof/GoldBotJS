@@ -21,7 +21,7 @@ module.exports = {
 	async execute(interaction) {
         const subcommand = interaction.options.getSubcommand();
         if (subcommand == "server") {
-            await interaction.reply(`This server is ${interaction.guild.name} and has ${interaction.guild.memberCount} members.`);
+            return await interaction.reply(`This server is ${interaction.guild.name} and has ${interaction.guild.memberCount} members.`);
         }
         else if (subcommand == "user"){
             const userObj = (interaction.options.getUser("target") ?? interaction.user);
@@ -54,14 +54,16 @@ module.exports = {
                 { name: 'Audit', value: audit, inline: true}
             )
             .setTimestamp();
-            await interaction.reply({embeds: [embed]});
+            return await interaction.reply({embeds: [embed]});
         }
         else if (subcommand == "game"){
             const user = interaction.user;
             const { gameData } = interaction.client;
             const userGame = gameData.get(user.id);
             if(userGame){
-                await interaction.reply({content: userGame.toString(), ephemeral: true})
+                await interaction.reply({content: userGame.toString() + `${userGame.log}`, ephemeral: true})
+                userGame.clearLog()
+                return
             }
         }
 	},
