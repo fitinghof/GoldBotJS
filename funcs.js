@@ -63,7 +63,7 @@ class player {
 	}
     addWinnings(winnings){
         this.gold += Math.round(winnings);
-        this.winnings += Math.round(winnings);
+        this.totalWinnings += Math.round(winnings);
     }
     addPray(amount = 100, successful = true){
         this.prays++;
