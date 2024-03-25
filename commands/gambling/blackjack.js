@@ -87,9 +87,9 @@ module.exports = {
 
         
             if(targetUser){
-                const table = interaction.client.blackJackTables.get(targetUser.id);
-                if(table){
-                    if(!table.playing){
+                const othertable = interaction.client.blackJackTables.get(targetUser.id);
+                if(othertable){
+                    if(!othertable.playing){
                         interaction.client.blackJackTables.get(targetUser.id).players.push({name: interaction.user.displayName, id: interaction.user.id, bet: bet, hand: [], split: [], status: "", splitStatus: ""})
                         return await interaction.reply({content: `${interaction.user.displayName} joined ${targetUser.displayName}!`, ephemeral: false})
                     }
@@ -122,6 +122,7 @@ module.exports = {
             let playAgain = true;
             while(playAgain){
                 //clear decks and add to used cards
+                table.playing = false;
                 table.clearAllCards();
                 table.players.forEach(player => {
                     table.usedCards = table.usedCards.concat(player.split);
@@ -161,7 +162,7 @@ module.exports = {
                     await table.closeTable();
                     return
                 }
-
+                table.playing = true;
                 
                 table.drawCards(table.dealerHand, 2);
                 table.players.forEach(player => table.drawCards(player.hand, 2));
@@ -198,7 +199,6 @@ module.exports = {
                 if(playingPlayers == 0) {
                     saveGameData(gameData);
                     updateLeaderBoards(interaction.client);
-                    table.playing = false;
                     await respons.update({content: `${table.toString(true)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
                     continue;
                 }
@@ -212,9 +212,9 @@ module.exports = {
                         if(cardValues[player.hand[0] % 13] == cardValues[player.hand[1] % 13]){ splitButton.setDisabled(false);}
                         let stand = false;
                         table.message.edit({content: `${table.toString(false)} \nPlayerTurn: ${player.name}\n${status}`, components: [buttons]})
+                        let firstCall = true;
                         while(!stand){
                             try {
-                                let firstCall = true;
                                 const buttonPressed = await table.message.awaitMessageComponent({ filter: (interaction => interaction.user.id === player.id), time: 60_000 });
 
                                 if(buttonPressed.customId == "stand") {
@@ -245,7 +245,6 @@ module.exports = {
                                     table.drawCards(player.split, 1)
                                     status = "split";
                                     } else status = "You couldn't afford to split!"
-
                                 }
                                 if(buttonPressed.customId == "double" && firstCall) {
                                     playerGame = gameData.get(player.id);
@@ -275,12 +274,12 @@ module.exports = {
                     }
                     splitButton.setDisabled(true);
                     doubleButton.setDisabled(true);
-                    if(player.split.length && handValue(player.split) < 21) {
+                    if((player.split.length > 0)) {
                         try {
-                            table.message.edit({content: `${table.toString(false)} \nPlayerTurn: ${player.name} splithand\n${status}`, components: [buttons]})
-                            let stand = false;
+                            await table.message.edit({content: `${table.toString(false)} \nPlayerTurn: ${player.name} splithand\n${status}`, components: [buttons]})
+                            stand = false;
                             while(!stand){
-                                const buttonPressed = await message.awaitMessageComponent({ filter: (interaction => interaction.user.id === player.id), time: 60_000 });
+                                const buttonPressed = await table.message.awaitMessageComponent({ filter: (interaction => interaction.user.id === player.id), time: 60_000 });
                                 if(buttonPressed.customId == "stand") {
                                     stand = true;
                                     status = "stood";
@@ -336,7 +335,7 @@ module.exports = {
                         interaction.client.otherData.set("jackPot", jackPot + player.bet)
                     }
                     if(player.split.length) {
-                        if((handValue(player.split) > handValue(table.dealerHand) && !player.splitStatus) || handValue(table.dealerHand) > 21) {
+                        if((handValue(player.split) > handValue(table.dealerHand) && !player.splitStatus) || handValue(table.dealerHand) > 21 && !player.splitStatus) {
                             playerGame.addWinnings(player.bet * 2);
                             if(playerGame.highestBlackjackWin < (player.bet * 2)) playerGame.highestBlackjackWin = (player.bet * 2);
                             player.splitStatus = `won ${player.bet * 2} 🪙`
@@ -357,7 +356,9 @@ module.exports = {
                 gameData.save()
                 interaction.client.otherData.save()
                 table.playing = false;
+                try {
                 await table.message.edit({content: `${table.toString(true)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
+                } catch (err) {console.error(err)}
             }
     },
 };

@@ -3,7 +3,7 @@
     "bankearnings":1,
     "bankPeriodmin":6,
     "rouletteWaitTime":30000,
-    "standardBotActivity": "Stealing money from children",
+    "standardBotActivity": "Use '/help'!",
     "blackJackDecks":6,
     "blackjackReshuffleLimit":92,
     "typicalFailureResponses":[

@@ -20,7 +20,7 @@ module.exports = {
                 const playerGame = interaction.client.gameData.get(interaction.user.id)
                 playerGame.gold += jackPot
                 const win = jackPot
-                jackPot = 0
+                interaction.client.otherData.set("jackPot", 0)
                 interaction.client.otherData.save()
                 return interaction.reply({content:`**${interaction.user.displayName} WON THE JACKPOT\nGot ${win}  🪙!**`})
             }
