@@ -54,6 +54,8 @@ module.exports = {
                 weaponStringRoom = room.weapon == 1 ? `rock` : weapon == 2 ? `paper` : `scissors`;
                 await interaction.reply({content: `\`${interaction.user.displayName}\` used ${weaponString}, \`${targetUser.displayName}\` used ${weaponStringRoom}\n${winner ? `\`${winner}\` won ${maxBet} gold!` : "its a draw!"}`})
                 interaction.client.rpsRooms.rpsRooms = rpsRooms.filter((obj, key) => key != targetUser.id);
+                updateLeaderBoards(interaction.client)
+                saveGameData(interaction.client.gameData)
                 return
             }
             interaction.reply({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Math.round((Date.now()+60000)/1000)}:R>`})

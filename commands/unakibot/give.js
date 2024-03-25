@@ -3,6 +3,7 @@ const { saveLeaderBoards, updateLeaderBoards, saveGameData, makeLeaderString } =
 
 module.exports = {
     category: 'unakibot',
+    save: true,
 	data: new SlashCommandBuilder()
 		.setName('give')
 		.setDescription(`Gives gold to the target user`)
@@ -24,8 +25,6 @@ module.exports = {
                 if(targetUserGame){
                     senderUserGame.gold -= amount;
                     targetUserGame.gold += amount;
-                    saveGameData(interaction.client.gameData);
-                    updateLeaderBoards(interaction.client);
                     return await interaction.reply({content: `${interaction.user.displayName} sent ${targetUser.displayName} ${amount} gold!`, ephemeral: false})
                 }
                 return await interaction.reply({content: `${targetUser.displayName} isn't in the game yet!`, ephemeral: true})

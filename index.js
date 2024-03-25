@@ -5,7 +5,9 @@ const { bankCost, bankearnings, bankPeriodmin } = require('./finaFilen.json');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, InteractionCollector } = require('discord.js');
-const { saveUser, updateLeaderBoards, player }  = require('./funcs.js');
+const { saveUser, updateLeaderBoards, player, saveGameData }  = require('./funcs.js');
+const interactionCreate = require('./events/interactionCreate.js');
+const { PersistantDataFile } = require("./shittyDatabase")
 
 const client = new Client({ intents: [
 	GatewayIntentBits.Guilds,
@@ -18,7 +20,8 @@ console.log = (...args) => origlog.apply(null, [`[${(new Date(Date.now()).toLoca
 
 client.commands = new Collection();
 client.cooldowns = new Collection();
-client.gameData = new Collection();
+client.gameData = new PersistantDataFile("persistantData", "userData", (entry) => {return new player(entry)})
+client.otherData = new PersistantDataFile("persistantData", "otherData", (entry) => { return entry }, Map)
 client.leaderBoards = new Collection();
 client.rouletteRooms = new Collection();
 client.rpsRooms = new Collection();
@@ -102,6 +105,7 @@ setInterval(() => {
 				obj.gold += obj.banks * bankearnings;
 			})
 			updateLeaderBoards(client);
+			client.gameData.save()
 		} catch(err) {console.error(err);}
 	}
 	if(minute%60 === 0) {

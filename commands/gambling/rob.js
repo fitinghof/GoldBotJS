@@ -3,6 +3,7 @@ const { saveGameData, updateLeaderBoards } = require('../../funcs');
 const { rouletteWaitTime, standardBotActivity } = require('../../finaFilen.json')
 module.exports = {
     category: 'gambling',
+    save: true,
     cooldown: 7200,
 	data: new SlashCommandBuilder()
 		.setName('rob')
@@ -43,8 +44,6 @@ module.exports = {
                 targetUserGame.gold -= robAmount;
                 targetUserGame.addLog(`${interaction.user.displayName} robbed you for ${robAmount} 🪙!`)
                 playerGame.gold += Math.round(robAmount*6/5);
-                saveGameData(interaction.client.gameData);
-                updateLeaderBoards(interaction.client);
                 return await interaction.reply({content: `${interaction.user.displayName} robbed ${targetUser.displayName} for ${robAmount} 🪙!`, ephemeral: false})
             }
             return await interaction.reply({content: `After tripping on a sausage and slapping the dog with a lamp you get caught by the police and lose your pricey equipment!`, ephemeral: true})

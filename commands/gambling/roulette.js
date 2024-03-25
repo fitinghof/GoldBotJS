@@ -3,6 +3,7 @@ const { saveGameData, updateLeaderBoards } = require('../../funcs');
 const { rouletteWaitTime, standardBotActivity } = require('../../finaFilen.json')
 module.exports = {
     category: 'gambling',
+    save: true,
 	data: new SlashCommandBuilder()
 		.setName('roulette')
 		.setDescription(`Gamble gold`)
@@ -64,6 +65,8 @@ module.exports = {
                             }
                             else{
                                 userGame.totalLosses += user.bet;
+                                const jackPot = interaction.client.otherData.get("jackPot")
+                                jackPot += user.bet
                                 playersStatus += `\n${gameData.get(key).name} lost ${user.bet} 🪙`;
                             }
                         })
@@ -71,8 +74,6 @@ module.exports = {
                         console.log(`rouletteRoom: ${user.displayName}, winning color: ${color}${playersStatus}` );
                         interaction.client.rouletteRooms.sweep((obj, key) => key === roomId);
                         if(!interaction.client.rouletteRooms.first()) {interaction.client.user.setActivity(standardBotActivity, {type: ActivityType.Custom});}
-                        updateLeaderBoards(interaction.client);
-                        saveGameData(gameData);
                     }, rouletteWaitTime)).catch(err => console.error(err))
                 }
             }

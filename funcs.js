@@ -1,9 +1,10 @@
 const fs = require('node:fs');
 function saveGameData(gameData) {
-    const data = JSON.stringify(Object.fromEntries(gameData), null, 2);
+    gameData.save();
+    /* const data = JSON.stringify(Object.fromEntries(gameData), null, 2);
     fs.writeFile(`./persistantData/userData.json`,data, (err) => {
         if(err) console.error(err);
-    })
+    }) */
 }
 function saveLeaderBoards(leaderboards) {
     const data = JSON.stringify(Object.fromEntries(leaderboards), null, 2);
@@ -39,7 +40,7 @@ async function updateLeaderBoards(client) {
 }
 
 class player {
-	name;
+	name = "John Doe";
 	gold = 1000;
 	banks = 0;
 	prays = 0;
@@ -91,8 +92,15 @@ class player {
         this.log = "\n**Log:**";
     }
 }
-
+const {typicalFailureResponses} = require("./finaFilen.json")
+/**
+ * @returns {string} Random message intendend for a failed gamble
+ */
+function randomFailMessage() {
+    return typicalFailureResponses[Math.floor(Math.random()*typicalFailureResponses.length)]
+}
 module.exports = {
+    randomFailMessage,
     player,
     saveGameData,
     saveLeaderBoards,

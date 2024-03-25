@@ -174,7 +174,12 @@ module.exports = {
                             playerGame.gold += player.bet;
                             player.status = "tied the dealer";
                         }
-                        else player.status = "lost against the dealer";
+                        else {
+                            player.status = "lost against the dealer";
+                            playerGame.totalLosses += player.bet;
+                            const jackPot = interaction.client.otherData.get("jackPot")
+                            jackPot += player.bet
+                        }
                         playingPlayers--;
                     })
                 }
@@ -255,6 +260,8 @@ module.exports = {
                                         if(handValue(player.hand) > 21) {
                                             player.status = "went Bust!";
                                             status = "went Bust!";
+                                            const jackPot = interaction.client.otherData.get("jackPot")
+                                            jackPot += player.bet
                                         }
                                     }
                                 }
@@ -287,6 +294,8 @@ module.exports = {
                                         playerGame.totalLosses += player.bet;
                                         player.splitStatus = "went Bust!";
                                         status = "went Bust!";
+                                        const jackPot = interaction.client.otherData.get("jackPot")
+                                        jackPot += player.bet
                                     }
                                     if(handValue(player.split) == 21) {
                                         stand = true;
@@ -323,6 +332,8 @@ module.exports = {
                     else if(handValue(player.hand) < handValue(table.dealerHand) && !player.status) {
                         player.status = `lost against the dealer`
                         playerGame.totalLosses += player.bet;
+                        const jackPot = interaction.client.otherData.get("jackPot")
+                        jackPot += player.bet
                     }
                     if(player.split.length) {
                         if((handValue(player.split) > handValue(table.dealerHand) && !player.splitStatus) || handValue(table.dealerHand) > 21) {
@@ -337,11 +348,14 @@ module.exports = {
                         else if(handValue(player.split) < handValue(table.dealerHand) && !player.splitStatus) {
                             player.splitStatus = `lost against the dealer`
                             playerGame.totalLosses += player.bet;
+                            const jackPot = interaction.client.otherData.get("jackPot")
+                            jackPot += player.bet
                         }
                     }
                 }
                 updateLeaderBoards(interaction.client);
-                saveGameData(gameData);
+                gameData.save()
+                interaction.client.otherData.save()
                 table.playing = false;
                 await table.message.edit({content: `${table.toString(true)}\n**Use /blackjack targetuser: ${interaction.user.displayName} to join!**`, components: [mainMenu]});
             }

@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { saveLeaderBoards, updateLeaderBoards, makeLeaderString, saveGameData } = require('../../funcs');
-
+const { updateLeaderBoards, saveGameData, randomFailMessage } = require('../../funcs');
 module.exports = {
     category: 'unakibot',
     cooldown: 10,
@@ -29,7 +28,7 @@ module.exports = {
             }  
             console.log(`"${interaction.user.displayName}" prayed for ${amount} to "${targetUser.displayName}" failed`)
             targetUsergame.addPray(amount, false);
-            return await interaction.reply({content: `You were not worthy.`, ephemeral: true})
+            return await interaction.reply({content: randomFailMessage(), ephemeral: true})
 
         },
 };

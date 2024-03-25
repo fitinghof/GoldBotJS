@@ -1,5 +1,5 @@
 const { Events, Collection, PermissionsBitField } = require('discord.js');
-const { player } = require('../funcs.js');
+const { player, updateLeaderBoards, saveGameData } = require('../funcs.js');
 
 
 module.exports = {
@@ -55,6 +55,11 @@ module.exports = {
 			await command.execute(interaction);
 			const endTime = Date.now()
 			console.log(`Command "/${command.data.name}" used by ${interaction.user.displayName} on [${startTimeFormated}] finished executing, took ${(endTime-startTime)/1000}s`)
+			save = (command.save ?? false)
+			if(save){
+				saveGameData(interaction.client.gameData)
+				updateLeaderBoards(interaction.client)
+			}
 		} catch (error) {
 			console.error(error);
 			try {
