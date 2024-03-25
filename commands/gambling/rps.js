@@ -51,18 +51,20 @@ module.exports = {
                     winner = targetUser.displayName;
                 }
                 weaponString = weapon == 1 ? `rock` : weapon == 2 ? `paper` : `scissors`;
-                weaponStringRoom = room.weapon == 1 ? `rock` : weapon == 2 ? `paper` : `scissors`;
+                weaponStringRoom = room.weapon == 1 ? `rock` : room.weapon == 2 ? `paper` : `scissors`;
                 await interaction.reply({content: `\`${interaction.user.displayName}\` used ${weaponString}, \`${targetUser.displayName}\` used ${weaponStringRoom}\n${winner ? `\`${winner}\` won ${maxBet} gold!` : "its a draw!"}`})
                 interaction.client.rpsRooms.rpsRooms = rpsRooms.filter((obj, key) => key != targetUser.id);
                 updateLeaderBoards(interaction.client)
                 saveGameData(interaction.client.gameData)
                 return
             }
-            interaction.reply({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Math.round((Date.now()+60000)/1000)}:R>`})
+            interaction.reply({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Math.round((Date.now()+60000)/1000)}:R>`, ephemeral: true})
+            interaction.channel.send({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Math.round((Date.now()+60000)/1000)}:R>`})
             const thisTime = Date.now();
             rpsRooms.set(interaction.user.id, {bet: bet, targetUser: targetUser.id, weapon: weapon, time: thisTime})
             return await new Promise(resolve => setTimeout( () =>{
                 if(rpsRooms.has(interaction.user.id) && rpsRooms.get(interaction.user.id).time === thisTime){
+                    userGame.gold += bet;
                     interaction.client.rpsRooms = rpsRooms.filter((obj, key) => key != interaction.user.id);
                 }
             }, 60000 )).catch(err => console.error(err));

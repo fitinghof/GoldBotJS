@@ -1,21 +1,21 @@
 {
   "431021822448762880": {
     "name": "SibbeeeGold",
-    "gold": 3770,
-    "banks": 750,
-    "prays": 4457,
-    "totalLosses": 670112,
+    "gold": 5899,
+    "banks": 760,
+    "prays": 4468,
+    "totalLosses": 671912,
     "prayTotal": 300344,
-    "totalWinnings": 617827,
-    "failedPrayers": 4009,
+    "totalWinnings": 619427,
+    "failedPrayers": 4020,
     "highestBlackjackWin": 40000,
     "highestRouletteWin": 360000,
     "log": "\n**Log:**"
   },
   "196272863148376064": {
     "name": "Ozzcarr",
-    "gold": 5965,
-    "banks": 730,
+    "gold": 12185,
+    "banks": 740,
     "prays": 2094,
     "totalLosses": 93783,
     "prayTotal": 97204,
@@ -27,7 +27,7 @@
   },
   "596336855729831976": {
     "name": "Sebbe",
-    "gold": 4606,
+    "gold": 13362,
     "banks": 398,
     "prays": 320,
     "totalLosses": 15025,
@@ -40,7 +40,7 @@
   },
   "286153078116450304": {
     "name": "Heroz",
-    "gold": 16451,
+    "gold": 17969,
     "banks": 69,
     "prays": 286,
     "totalLosses": 37185,
@@ -53,7 +53,7 @@
   },
   "277545581390462986": {
     "name": "Jag är vem",
-    "gold": 6444,
+    "gold": 7786,
     "banks": 61,
     "prays": 1397,
     "totalLosses": 31081,
@@ -66,7 +66,7 @@
   },
   "289102730046472192": {
     "name": "KuBis",
-    "gold": 825,
+    "gold": 2057,
     "banks": 56,
     "prays": 188,
     "totalLosses": 1100,
@@ -79,7 +79,7 @@
   },
   "261529891688808456": {
     "name": "Mariohrst",
-    "gold": 7592,
+    "gold": 8208,
     "banks": 28,
     "prays": 125,
     "totalLosses": 1001501,
@@ -92,7 +92,7 @@
   },
   "242020497817075712": {
     "name": "Eclipse",
-    "gold": 1992,
+    "gold": 2080,
     "banks": 4,
     "prays": 69,
     "totalLosses": 100,
@@ -105,7 +105,7 @@
   },
   "97358784006983680": {
     "name": "Vaktmaestarn",
-    "gold": 2193,
+    "gold": 2237,
     "banks": 2,
     "prays": 9,
     "totalLosses": 0,
@@ -125,6 +125,32 @@
     "prayTotal": 1800,
     "totalWinnings": 1000,
     "failedPrayers": 14,
+    "highestBlackjackWin": 0,
+    "highestRouletteWin": 0,
+    "log": "\n**Log:**"
+  },
+  "288698873487032321": {
+    "name": "GucciGhandi",
+    "gold": 1831,
+    "banks": 1,
+    "prays": 32,
+    "totalLosses": 0,
+    "prayTotal": 2048,
+    "totalWinnings": 0,
+    "failedPrayers": 15,
+    "highestBlackjackWin": 0,
+    "highestRouletteWin": 0,
+    "log": "\n**Log:**"
+  },
+  "291299172592779276": {
+    "name": "bobr",
+    "gold": 566,
+    "banks": 2,
+    "prays": 5,
+    "totalLosses": 0,
+    "prayTotal": 300,
+    "totalWinnings": 0,
+    "failedPrayers": 2,
     "highestBlackjackWin": 0,
     "highestRouletteWin": 0,
     "log": "\n**Log:**"
@@ -155,18 +181,31 @@
     "highestRouletteWin": 0,
     "log": "\n**Log:**"
   },
-  "291299172592779276": {
-    "name": "bobr",
-    "gold": 1180,
+  "302762463806488576": {
+    "name": "Cedian",
+    "gold": 1173,
     "banks": 0,
-    "prays": 4,
-    "totalLosses": 0,
-    "prayTotal": 200,
+    "prays": 3,
+    "totalLosses": 100,
+    "prayTotal": 100,
     "totalWinnings": 0,
     "failedPrayers": 2,
     "highestBlackjackWin": 0,
     "highestRouletteWin": 0,
-    "log": "\n**Log:**\nPussPuss"
+    "log": "\n**Log:**\n[2024-03-25 17:55:38] bobr robbed you for 250 🪙!\n[2024-03-25 19:30:01] August robbed you for 100 🪙!"
+  },
+  "237571648386105344": {
+    "name": "August",
+    "gold": 102,
+    "banks": 1,
+    "prays": 0,
+    "totalLosses": 0,
+    "prayTotal": 0,
+    "totalWinnings": 0,
+    "failedPrayers": 0,
+    "highestBlackjackWin": 0,
+    "highestRouletteWin": 0,
+    "log": "\n**Log:**"
   },
   "227112639610748939": {
     "name": "Mikty",
@@ -175,19 +214,6 @@
     "prays": 1,
     "totalLosses": 100,
     "prayTotal": 100,
-    "totalWinnings": 0,
-    "failedPrayers": 0,
-    "highestBlackjackWin": 0,
-    "highestRouletteWin": 0,
-    "log": "\n**Log:**"
-  },
-  "302762463806488576": {
-    "name": "Cedian",
-    "gold": 900,
-    "banks": 0,
-    "prays": 0,
-    "totalLosses": 100,
-    "prayTotal": 0,
     "totalWinnings": 0,
     "failedPrayers": 0,
     "highestBlackjackWin": 0,

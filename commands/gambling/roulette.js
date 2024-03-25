@@ -66,7 +66,8 @@ module.exports = {
                             else{
                                 userGame.totalLosses += user.bet;
                                 const jackPot = interaction.client.otherData.get("jackPot")
-                                jackPot += user.bet
+                                interaction.client.otherData.set("jackPot", jackPot + user.bet)
+                                interaction.client.otherData.save()
                                 playersStatus += `\n${gameData.get(key).name} lost ${user.bet} 🪙`;
                             }
                         })

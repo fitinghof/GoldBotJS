@@ -169,8 +169,8 @@ module.exports = {
                 let playingPlayers = table.players.length;
                 if(handValue(table.dealerHand) == 21) {
                     table.players.forEach(player => {
+                        const playerGame = gameData.get(player.id);
                         if(handValue(player.hand)  == 21){
-                            const playerGame = gameData.get(player.id);
                             playerGame.gold += player.bet;
                             player.status = "tied the dealer";
                         }
@@ -178,7 +178,7 @@ module.exports = {
                             player.status = "lost against the dealer";
                             playerGame.totalLosses += player.bet;
                             const jackPot = interaction.client.otherData.get("jackPot")
-                            jackPot += player.bet
+                            interaction.client.otherData.set("jackPot", jackPot + player.bet)
                         }
                         playingPlayers--;
                     })
@@ -261,7 +261,7 @@ module.exports = {
                                             player.status = "went Bust!";
                                             status = "went Bust!";
                                             const jackPot = interaction.client.otherData.get("jackPot")
-                                            jackPot += player.bet
+                                            interaction.client.otherData.set("jackPot", jackPot + player.bet)
                                         }
                                     }
                                 }
@@ -295,7 +295,7 @@ module.exports = {
                                         player.splitStatus = "went Bust!";
                                         status = "went Bust!";
                                         const jackPot = interaction.client.otherData.get("jackPot")
-                                        jackPot += player.bet
+                                        interaction.client.otherData.set("jackPot", jackPot + player.bet)
                                     }
                                     if(handValue(player.split) == 21) {
                                         stand = true;
@@ -333,7 +333,7 @@ module.exports = {
                         player.status = `lost against the dealer`
                         playerGame.totalLosses += player.bet;
                         const jackPot = interaction.client.otherData.get("jackPot")
-                        jackPot += player.bet
+                        interaction.client.otherData.set("jackPot", jackPot + player.bet)
                     }
                     if(player.split.length) {
                         if((handValue(player.split) > handValue(table.dealerHand) && !player.splitStatus) || handValue(table.dealerHand) > 21) {
@@ -349,7 +349,7 @@ module.exports = {
                             player.splitStatus = `lost against the dealer`
                             playerGame.totalLosses += player.bet;
                             const jackPot = interaction.client.otherData.get("jackPot")
-                            jackPot += player.bet
+                            interaction.client.otherData.set("jackPot", jackPot + player.bet)
                         }
                     }
                 }
