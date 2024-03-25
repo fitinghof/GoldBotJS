@@ -6,28 +6,8 @@ const path = require('path');
 class DataBase {
     #directoryPath;
     data = {};
-    constructor(filePath) {
-        this.#directoryPath = filePath;
-/*         const dataPath = fs.readdirSync(this.#directoryPath)
-        for (const file of dataPath) {
-            const filePath = path.join(this.#directoryPath, file);
-            const dataString = fs.readFileSync(filePath, 'utf8');
-            const data = JSON.parse(dataString);
-            const dataName = file.replace(".json", "")
-            const dataCollection = new Collection()
-            for(const key in data){
-                dataCollection.set(key, converter(data[key]))
-            }
-            this.data[dataName] = {}
-            this.data[dataName] = dataCollection;
-            this.data[dataName].save = () => {
-                const newData = JSON.stringify(Object.fromEntries(this.data[dataName]), null, 2);
-                    fs.writeFile(path.join(this.#directoryPath, dataName, ".json"), newData, (err) => {
-                        if(err) console.error(err);
-                    })
-                };
-        } 
-    */
+    constructor(directoryPath) {
+        this.#directoryPath = directoryPath;
 }
     SyncData(dataName, converter = function (entry) { return entry }) {
         const filePath = path.join(this.#directoryPath, dataName + ".json");
