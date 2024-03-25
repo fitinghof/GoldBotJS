@@ -1,7 +1,7 @@
 {
   "196272863148376064": {
     "name": "Ozzcarr",
-    "gold": 7800,
+    "gold": 103350,
     "banks": 650,
     "prays": 2087,
     "totalLosses": 93783,
@@ -14,7 +14,7 @@
   },
   "431021822448762880": {
     "name": "SibbeeeGold",
-    "gold": 1097,
+    "gold": 95177,
     "banks": 640,
     "prays": 4453,
     "totalLosses": 590112,
@@ -27,7 +27,7 @@
   },
   "596336855729831976": {
     "name": "Sebbe",
-    "gold": 19432,
+    "gold": 68236,
     "banks": 332,
     "prays": 320,
     "totalLosses": 15025,
@@ -40,7 +40,7 @@
   },
   "286153078116450304": {
     "name": "Heroz",
-    "gold": 5135,
+    "gold": 15278,
     "banks": 69,
     "prays": 286,
     "totalLosses": 37185,
@@ -53,7 +53,7 @@
   },
   "277545581390462986": {
     "name": "Jag är vem",
-    "gold": 2440,
+    "gold": 11407,
     "banks": 61,
     "prays": 1394,
     "totalLosses": 31081,
@@ -66,7 +66,7 @@
   },
   "289102730046472192": {
     "name": "KuBis",
-    "gold": 11242,
+    "gold": 16975,
     "banks": 39,
     "prays": 188,
     "totalLosses": 1100,
@@ -79,7 +79,7 @@
   },
   "261529891688808456": {
     "name": "Mariohrst",
-    "gold": 3000,
+    "gold": 7116,
     "banks": 28,
     "prays": 125,
     "totalLosses": 1001501,
@@ -92,7 +92,7 @@
   },
   "242020497817075712": {
     "name": "Eclipse",
-    "gold": 1336,
+    "gold": 1924,
     "banks": 4,
     "prays": 69,
     "totalLosses": 100,
@@ -105,7 +105,7 @@
   },
   "97358784006983680": {
     "name": "Vaktmaestarn",
-    "gold": 1865,
+    "gold": 2159,
     "banks": 2,
     "prays": 9,
     "totalLosses": 0,
@@ -114,7 +114,7 @@
     "failedPrayers": 8,
     "highestBlackjackWin": 0,
     "highestRouletteWin": 0,
-    "log": "\n**Log:**\nTjena snygging"
+    "log": "\n**Log:**"
   },
   "259331124982054913": {
     "name": "Jokern",
@@ -192,6 +192,6 @@
     "failedPrayers": 0,
     "highestBlackjackWin": 0,
     "highestRouletteWin": 0,
-    "log": "\n**Log:**\n01110011 01100101 01101110 01100100 00100000 01101110 01110101 01100100 01100101 01110011"
+    "log": "\n**Log:**"
   }
 }
