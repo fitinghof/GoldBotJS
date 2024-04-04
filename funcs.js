@@ -50,6 +50,7 @@ class player {
 	failedPrayers = 0;
     highestBlackjackWin = 0;
     highestRouletteWin = 0;
+    timeLastRob = 0;
     log = "\n**Log:**";
 	constructor(obj){
         for(const property in obj){
@@ -75,6 +76,10 @@ class player {
         }
     }
     toString(){
+        const fullChanceTime = 24;
+        const startChance = 0.5;
+        const timeSinceLastRob = Math.min((Date.now() - this.timeLastRob)/(1000*60*60), fullChanceTime);
+        const timeChanceMultiplier = startChance + (timeSinceLastRob * (1 - startChance)) / fullChanceTime
         return (
         `🪙 : ${this.gold} \n` +
         `🏦 : ${this.banks}\n` +
@@ -82,7 +87,9 @@ class player {
         `**Successfull Prayers:** ${this.prays - this.failedPrayers}\n` +
         `**Blessings from god:** ${this.prayTotal}\n` +
         `**Total Winnings:** ${this.totalWinnings}\n` +
-        `**Total Losses:** ${this.totalLosses}`
+        `**Total Losses:** ${this.totalLosses}\n` +
+        `**Max rob chance:** <t:${Math.floor((this.timeLastRob + 24*60*60*1000)/1000)}:R>\n` +
+        `**Current rob multiplier:** ${Math.floor(timeChanceMultiplier*100)}%`
         )
     }
     addLog(loggedData) {

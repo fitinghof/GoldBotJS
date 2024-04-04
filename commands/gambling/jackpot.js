@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, Collection, ActivityType} = require('discord.js');
-const { saveGameData, updateLeaderBoards, randomFailMessage, player } = require('../../funcs');
+const { randomFailMessage } = require('../../funcs');
 module.exports = {
     category: 'gambling',
     cooldown: 72000,
@@ -20,7 +20,7 @@ module.exports = {
                 const playerGame = interaction.client.gameData.get(interaction.user.id)
                 playerGame.gold += jackPot
                 const win = jackPot
-                interaction.client.otherData.set("jackPot", 0)
+                interaction.client.otherData.set("jackPot", 100000)
                 interaction.client.otherData.save()
                 return interaction.reply({content:`**${interaction.user.displayName} WON THE JACKPOT\nGot ${win}  🪙!**`})
             }

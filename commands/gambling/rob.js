@@ -15,7 +15,8 @@ module.exports = {
         .addIntegerOption(option =>
             option.setName("amount")
             .setDescription("How much will you try to take? You will need equipment worth 1/5 of this.")
-            .setMinValue(100)),
+            .setMinValue(100)
+            .setRequired(true)),
 	    async execute(interaction) {
             const robAmount = interaction.options.getInteger("amount") ?? 100;
             const playerGame = interaction.client.gameData.get(interaction.user.id);
@@ -37,8 +38,13 @@ module.exports = {
             const activity = (targetUser.presence) ? targetUser.presence.status : "idle";
             const activityChanceModifier = (activity === "online") ? 100 : (activity === "idle" || activity === "dnd") ? 1 : 0.5;
             //const chance = 0.8 / (1 + (40/Math.pow(targetUserGame.gold / robAmount, 3)) * activityChanceModifier);
-            const chance = 0.8/(1+30*Math.pow(robAmount / targetUserGame.gold, 3) * activityChanceModifier) 
+            const fullChanceTime = 24;
+            const startChance = 0.5;
+            const timeSinceLastRob = Math.min((Date.now() - playerGame.timeLastRob)/(1000*60*60), fullChanceTime);
+            const timeChanceMultiplier = startChance + (timeSinceLastRob * (1 - startChance)) / fullChanceTime
+            const chance = (0.8 * timeChanceMultiplier)/(1+30*Math.pow(robAmount / targetUserGame.gold, 3) * activityChanceModifier) 
             console.log(`robbery success chance: ${chance}, target gold: ${targetUserGame.gold} robAmount: ${robAmount}`);
+            playerGame.timeLastRob = Date.now()
             playerGame.gold -= Math.round(robAmount/5);
             if(!Math.floor(Math.random() * 1/chance)){
                 targetUserGame.gold -= robAmount;
