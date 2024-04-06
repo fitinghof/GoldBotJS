@@ -1,6 +1,22 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { saveGameData, updateLeaderBoards } = require('../../funcs');
 const { bankCost, bankearnings, bankPeriodmin } = require('../../finaFilen.json');
+
+const rock = new ButtonBuilder()
+.setCustomId("rock")
+.setLabel("Rock")
+.setStyle(ButtonStyle.Danger);
+const paper = new ButtonBuilder()
+.setCustomId("paper")
+.setLabel("Paper")
+.setStyle(ButtonStyle.Success);
+const scissors = new ButtonBuilder()
+.setCustomId("scissors")
+.setLabel("Scissors")
+.setStyle(ButtonStyle.Primary);
+
+const buttons = new ActionRowBuilder()
+.addComponents(rock, paper, scissors)
 
 module.exports = {
     category: 'gambling',
@@ -22,51 +38,57 @@ module.exports = {
                     .setChoices({name:"rock", value: 1}, {name: "paper", value: 2}, {name: "scissors", value: 3})
                     .setRequired(true)),
 	    async execute(interaction) {
-            const targetUser = interaction.options.getUser("target");
-            const weapon = interaction.options.getInteger("weapon");
-            const bet = interaction.options.getInteger("bet");
-            const { rpsRooms } = interaction.client
+            const targetUser = interaction.options.getUser("target")
+            const weapon = interaction.options.getInteger("weapon")
+            const bet = interaction.options.getInteger("bet")
             const { gameData } = interaction.client
             const userGame = gameData.get(interaction.user.id);
+            const challengeTimeOutTime = 60 * 1000
+            if(userGame.gold < bet) return interaction.reply({content:`Poor fuck`, ephemeral: true})
             userGame.gold -= bet;
-
-            let winner;
-            if(rpsRooms.has(targetUser.id) && rpsRooms.get(targetUser.id).targetUser === interaction.user.id){
-                const room = rpsRooms.get(targetUser.id);
-                const roomGame = gameData.get(targetUser.id);
-                const maxBet = Math.min(bet, room.bet);
-                if((weapon - room.weapon) === 0){
-                    userGame.gold += bet;
-                    roomGame.gold += room.bet;
-
+            const player2Game = gameData.get(targetUser.id)
+            if(!player2Game) return interaction.reply({content:`${targetUser.displayName} is homeless`, ephemeral: true})
+            
+            interaction.reply({content: `Challenge made!`, ephemeral: true})
+            const message = await interaction.channel.send({
+                content: `\`${interaction.user.displayName}\` has challenged ${targetUser} for ${bet}  🪙 !`+
+                `\nChallenge times out <t:${Math.round((Date.now()+challengeTimeOutTime)/1000)}:R>\nPress a button to accept!`, components: [buttons]})
+            let buttonInteraction
+            try {
+                buttonInteraction = await message.awaitMessageComponent({ filter: (interaction => interaction.user.id === targetUser.id), time: challengeTimeOutTime })
+                if(player2Game.gold < bet) {
+                    userGame.gold += bet
+                    return buttonInteraction.update({content:`\`${targetUser.displayName}\` was practically speaking homeless.`, components: []})
                 }
-                else if((weapon + 2) % 3 === room.weapon % 3){
-                    userGame.gold += (maxBet + bet);
-                    roomGame.gold += (room.bet - maxBet);
-                    winner = interaction.user.displayName;
-                }
-                else {
-                    roomGame.gold += (room.bet + maxBet);
-                    userGame.gold += (bet - maxBet);
-                    winner = targetUser.displayName;
-                }
-                weaponString = weapon == 1 ? `rock` : weapon == 2 ? `paper` : `scissors`;
-                weaponStringRoom = room.weapon == 1 ? `rock` : room.weapon == 2 ? `paper` : `scissors`;
-                await interaction.reply({content: `\`${interaction.user.displayName}\` used ${weaponString}, \`${targetUser.displayName}\` used ${weaponStringRoom}\n${winner ? `\`${winner}\` won ${maxBet} gold!` : "its a draw!"}`})
-                interaction.client.rpsRooms.rpsRooms = rpsRooms.filter((obj, key) => key != targetUser.id);
-                updateLeaderBoards(interaction.client)
-                saveGameData(interaction.client.gameData)
+                player2Game.gold -= bet
+            } catch(error) {
+                try {
+                    message.edit({content: `\`${targetUser.displayName}\` didn't join in time`, components: []})
+                } catch(err) {console.error(err)}
+                userGame.gold += bet
                 return
             }
-            interaction.reply({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Math.round((Date.now()+60000)/1000)}:R>`, ephemeral: true})
-            interaction.channel.send({content: `\`${interaction.user.displayName}\` has challenged \`${targetUser.displayName}\` for ${bet} gold! use /rps \`${interaction.user.displayName}\` to accept their challenge!\nChallenge times out in <t:${Math.round((Date.now()+60000)/1000)}:R>`})
-            const thisTime = Date.now();
-            rpsRooms.set(interaction.user.id, {bet: bet, targetUser: targetUser.id, weapon: weapon, time: thisTime})
-            return await new Promise(resolve => setTimeout( () =>{
-                if(rpsRooms.has(interaction.user.id) && rpsRooms.get(interaction.user.id).time === thisTime){
-                    userGame.gold += bet;
-                    interaction.client.rpsRooms = rpsRooms.filter((obj, key) => key != interaction.user.id);
-                }
-            }, 60000 )).catch(err => console.error(err));
-        },
-};
+            const otherPlayerWeapon = buttonInteraction.customId === "rock" ? 1 : buttonInteraction.customId === "paper" ? 2 : 3
+            let winner
+            if((weapon - otherPlayerWeapon) === 0){
+                userGame.gold += bet
+                player2Game.gold += bet
+
+            }
+            else if((weapon + 2) % 3 === otherPlayerWeapon % 3){
+                userGame.gold += bet * 2
+                winner = interaction.user.displayName
+            }
+            else {
+                player2Game.gold += bet * 2
+                winner = targetUser.displayName;
+            }
+            weaponString = weapon == 1 ? `rock` : weapon == 2 ? `paper` : `scissors`
+            weaponStringRoom = buttonInteraction.customId
+            await message.edit({content: `\`${interaction.user.displayName}\` used ${weaponString}, \`${targetUser.displayName}\` used ${weaponStringRoom}\n${winner ? `\`${winner}\` won ${bet}  🪙 !` : "its a draw!"}\nUse \`/rps\` to play again!`, components:[]})
+            updateLeaderBoards(interaction.client)
+            saveGameData(interaction.client.gameData)
+            return
+        }
+
+    }

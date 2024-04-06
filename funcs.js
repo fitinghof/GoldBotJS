@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const { PermissionsBitField } = require('discord.js');
 function saveGameData(gameData) {
     gameData.save();
     /* const data = JSON.stringify(Object.fromEntries(gameData), null, 2);
@@ -28,8 +29,21 @@ async function updateLeaderBoards(client) {
         client.leaderBoards.each(async (obj, err) => {
         try {
             const channel = await client.channels.fetch(obj.channel);
-            const message = await channel.messages.fetch(obj.id);
-            message.edit(newLeaderBoard);
+            try {
+                if(channel.permissionsFor(client.application.id).has([
+                    PermissionsBitField.Flags.ViewChannel,
+                    PermissionsBitField.Flags.SendMessages
+                ])) {
+                    const message = await channel.messages.fetch(obj.id);
+                    message.edit(newLeaderBoard);
+                }
+                
+            } catch (error) {
+                console.error(error)
+            }
+
+
+
         } catch(err) {
         client.leaderBoards.sweep(badobj => badobj === obj);
         saveLeaderBoards(client.leaderBoards)

@@ -1,0 +1,151 @@
+const { SlashCommandBuilder, Collection, Events, ButtonBuilder, ButtonStyle, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle} = require('discord.js');
+const { saveGameData, updateLeaderBoards } = require('../../funcs.js');
+const { rouletteWaitTime, standardBotActivity } = require('../../finaFilen.json');
+const { cardsFormated, cardFlags, cardGame } = require("../../cards.js");
+const interactionCreate = require('../../events/interactionCreate.js');
+const cardValues = [11,2,3,4,5,6,7,8,9,10,10,10,10];
+
+function handToString(hand) {
+    return hand.reduce((accumulator, currentvalue) => accumulator += (cardsFormated[currentvalue] + " "), "" )
+}
+function handValue(hand){
+    let value = 0;
+    let aces = 0;
+    hand.forEach(card => {
+        const cardnum = card % 13;
+        if(cardnum == 0) {aces += 1}
+        else {value += cardValues[cardnum]}
+    })
+    let aceValue = aces * cardValues[0];
+    for(let i = 0; i < aces; i++) {
+        if((aceValue + value) <= 21 ){
+            value += aceValue;
+            return value;
+        }
+        aceValue -= (cardValues[0]-1);
+    }
+    value += aceValue;
+    return value;
+}
+
+const putButton = new ButtonBuilder()
+.setCustomId("put")
+.setLabel("Put")
+.setStyle(ButtonStyle.Success);
+
+const standButton = new ButtonBuilder()
+.setCustomId("stand")
+.setLabel("Stand")
+.setStyle(ButtonStyle.Secondary);
+
+const splitButton = new ButtonBuilder()
+.setCustomId("split")
+.setLabel("Split")
+.setDisabled(true)
+.setStyle(ButtonStyle.Primary);
+
+const doubleButton = new ButtonBuilder()
+.setCustomId("double")
+.setLabel("Double")
+.setDisabled(true)
+.setStyle(ButtonStyle.Danger);
+
+const startButton = new ButtonBuilder()
+.setCustomId("start")
+.setLabel("Start")
+.setStyle(ButtonStyle.Success);
+
+const leaveButton = new ButtonBuilder()
+.setCustomId("leave")
+.setLabel("Leave")
+.setStyle(ButtonStyle.Danger);
+
+const joinButton = new ButtonBuilder()
+.setCustomId("join")
+.setLabel("Join")
+.setStyle(ButtonStyle.Success);
+
+const buttons = new ActionRowBuilder()
+.addComponents(putButton, standButton, splitButton, doubleButton);
+const mainMenu = new ActionRowBuilder()
+.addComponents(startButton, joinButton, leaveButton);
+module.exports = {
+    category: 'gambling',
+	data: new SlashCommandBuilder()
+		.setName('test')
+		.setDescription(`Gamble gold`)
+        .addIntegerOption(option =>
+            option.setName("bet")
+            .setDescription("How much to bet")
+            .setMinValue(1)
+            .setRequired(true)),
+	    async execute(interaction) {
+            const { gameData } = interaction.client;
+            const { blackJackDecks, blackjackReshuffleLimit } = require('../../finaFilen.json')
+            const userGame = gameData.get(interaction.user.id);
+            const bet = interaction.options.getInteger("bet");
+            if(userGame.gold < bet) return await interaction.reply({content: `You can't afford that bet`, ephemeral: true})
+            
+            
+            const blackJackTables = interaction.client.blackJackTables
+            const table = new cardGame(blackJackDecks, blackjackReshuffleLimit)
+            table.closeTable = async () => {
+                await table.message.edit({content: `This Blackjack table has closed!\nUse \`/blackjack\` to create a new one!`, components: []})
+                table.interaction.client.blackJackTables.sweep((room, key) => key === table.message.id);
+            }
+            table.toString = (showfullDealerHand = false) => {
+                let tableString = "Dealer:  ";
+                showfullDealerHand ? tableString += `${handToString(table.dealerHand)}` : tableString += `${cardsFormated[table.dealerHand[0]]}` ?? ``;
+                tableString += `  remaining cards: ${table.deck.length}\n`
+                table.players.forEach(player => {
+                    tableString += `\n${player.name}:  ${handToString(player.hand)} ${player.status}  bet: ${player.bet} 🪙`
+                    if(player.split.length) tableString += `\n${player.name} split hand:  ${handToString(player.split)} ${player.splitStatus}  bet: ${player.bet} 🪙`
+                })
+                return tableString;
+            }
+            table.playing = false
+            
+            table.players.push({id: interaction.user.id, name: interaction.user.displayName, hand:[], split:[], bet: bet, status: 0})
+            table.message = await interaction.reply({content: table.toString(), components: [mainMenu]})
+            blackJackTables.set(table.message.id, table)
+            
+            const modal = new ModalBuilder()
+            .setCustomId('joinBlackJack')
+            .setTitle('Join the BlackJack table!');
+            
+            const betInput = new TextInputBuilder()
+            .setCustomId(table.message.id)
+            .setLabel("Type your bet in digits only")
+            .setStyle(TextInputStyle.Short);
+            
+            const firstActionRow = new ActionRowBuilder().addComponents(betInput);
+            
+            modal.addComponents(firstActionRow);
+            //Shit actually starts
+            while(true){
+                const buttonPress = await table.message.awaitMessageComponent({time: 60_000})
+                if(buttonPress.customId === "start") {
+                    table.playing = true
+                    table.drawCards(table.dealerHand, 2)
+                    table.players.forEach(player => {
+                        table.drawCards(player.hand, 2)
+                    })
+                    buttonPress.update({content: table.toString(), components: [buttons]})
+                    break
+                }
+                else if(buttonPress.customId === "join") {
+                    
+                    const playerHasAlreadyJoined = table.players.some((player) => {return player.id === buttonPress.user.id})
+                    console.log(table.players[0].id, buttonPress.user.id)
+                    if(!playerHasAlreadyJoined) buttonPress.showModal(modal)
+                    else buttonPress.update({content: table.toString()})
+                }
+                else if (buttonPress.customId === "leave") {
+                    table.players = table.players.filter((player) => {return player.id === buttonPress.user.id})
+                    buttonPress.update({content: table.toString()})
+                }
+                if(table.players.length === 0) return await table.closeTable()
+            } 
+            blackJackTables.sweep((value, key) => key === table.message.id);  
+        },
+};
