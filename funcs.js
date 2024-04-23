@@ -65,6 +65,7 @@ class player {
     highestBlackjackWin = 0;
     highestRouletteWin = 0;
     timeLastRob = 0;
+    goldDonated = 0;
     log = "\n**Log:**";
 	constructor(obj){
         for(const property in obj){

@@ -25,6 +25,7 @@ module.exports = {
                 if(targetUserGame){
                     senderUserGame.gold -= amount;
                     targetUserGame.gold += amount;
+                    senderUserGame.goldDonated += amount;
                     return await interaction.reply({content: `${interaction.user.displayName} sent ${targetUser.displayName} ${amount} gold!`, ephemeral: false})
                 }
                 return await interaction.reply({content: `${targetUser.displayName} isn't in the game yet!`, ephemeral: true})
